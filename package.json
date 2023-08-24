@@ -24,6 +24,7 @@
     "db:seed:undo": "ts-node node_modules/.bin/sequelize db:seed:undo:all"
   },
   "dependencies": {
+    "@nestjs-modules/mailer": "^1.9.1",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^3.0.0",
     "@nestjs/core": "^9.0.0",
@@ -42,6 +43,7 @@
     "js-yaml": "^4.1.0",
     "moment": "^2.29.4",
     "mysql2": "^3.5.1",
+    "nodemailer": "^6.9.4",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
@@ -58,6 +60,7 @@
     "@types/express": "^4.17.13",
     "@types/jest": "29.5.1",
     "@types/node": "18.16.12",
+    "@types/nodemailer": "^6.4.9",
     "@types/sequelize": "^4.28.15",
     "@types/supertest": "^2.0.11",
     "@typescript-eslint/eslint-plugin": "^5.0.0",

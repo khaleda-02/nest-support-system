@@ -2,6 +2,7 @@ import { ConfigService } from '@nestjs/config';
 import { Sequelize } from 'sequelize-typescript';
 import { SEQUELIZE } from 'src/common/contants';
 import { User } from '../user/models/user.model';
+import { Ticket } from '../ticket/models/ticket.model';
 
 export const databaseProviders = [
   {
@@ -9,7 +10,7 @@ export const databaseProviders = [
     useFactory: async (configService: ConfigService) => {
       const config = configService.get('database');
       const sequelize = new Sequelize(config);
-      sequelize.addModels([User]);
+      sequelize.addModels([User, Ticket]);
       return sequelize;
     },
 

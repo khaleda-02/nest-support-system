@@ -26,6 +26,7 @@ export class AuthService {
   async register(registerDto: RegisterDto) {
     registerDto.password = await hash(registerDto.password, 10);
     const { password, ...user } = await this.userService.create(registerDto);
-    return { user };
+    // TODO: send an  email;
+    return user;
   }
 }
