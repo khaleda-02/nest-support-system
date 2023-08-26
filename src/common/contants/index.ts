@@ -5,5 +5,6 @@ export const PRODUCTION = 'production';
 export const USER_REPOSITORY = 'USER_REPOSITORY';
 export const TICKET_REPOSITORY = 'TICKET_REPOSITORY';
 export const COMMENT_REPOSITORY = 'COMMENT_REPOSITORY';
+export const EMAIL_REPOSITORY = 'EMAIL_REPOSITORY';
 export const IS_PUBLIC_KEY = 'isPublic';
 export const ROLES_KEY = 'roles';

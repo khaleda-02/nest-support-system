@@ -11,6 +11,7 @@ import {
 } from 'sequelize-typescript';
 import { Role, UserStatus } from 'src/common/enums';
 import { Comment } from 'src/modules/comment/models/comment.model';
+import { Email } from 'src/modules/email/models/email.model';
 import { Ticket } from 'src/modules/ticket/models/ticket.model';
 
 const { DATE, NUMBER, STRING, BOOLEAN } = DataType;
@@ -55,6 +56,9 @@ export class User extends Model<User> {
 
   @HasMany(() => Comment)
   comments: Comment[];
+
+  @HasMany(() => Email)
+  emails: Email[];
 
   @Column(DATE)
   createdAt: Date;

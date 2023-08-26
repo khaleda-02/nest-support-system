@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { hash, compare } from 'bcrypt';
 import { CreateUserDto } from 'src/common/dtos/create-user.dto';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class AuthService {
@@ -11,12 +12,14 @@ export class AuthService {
   constructor(
     private userService: UserService,
     private JwtService: JwtService,
+    private emailService: EmailService,
   ) {}
 
   async login({ username, password }: LoginDto) {
     const { password: userPassword, ...user } = await this.userService.findOne(
       username,
     );
+
     const isPasswordCorrect = await compare(password, userPassword);
     if (!isPasswordCorrect)
       throw new UnauthorizedException('wrong username or password');
@@ -28,8 +31,10 @@ export class AuthService {
 
   async register(createUserDto: CreateUserDto) {
     createUserDto.password = await hash(createUserDto.password, 10);
-    const { password, ...user } = await this.userService.create(createUserDto);
-    // TODO: send an  email;
+    const { password, otp, ...user } = await this.userService.create(
+      createUserDto,
+    );
+    await this.emailService.userConfirmation(user.id, otp);
     return user;
   }
 }

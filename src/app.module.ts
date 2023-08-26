@@ -5,9 +5,10 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { DatabaseModule } from './modules/database/database.module';
 import { TicketModule } from './modules/ticket/ticket.module';
-import { NotificationModule } from './modules/notification/notification.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { CommentModule } from './modules/comment/comment.module';
+import { EmailModule } from './modules/email/email.module';
+import { TestController } from './test.controller';
 
 @Module({
   imports: [
@@ -16,10 +17,10 @@ import { CommentModule } from './modules/comment/comment.module';
     AuthModule,
     UserModule,
     TicketModule,
-    NotificationModule,
     AdminModule,
     CommentModule,
+    EmailModule,
   ],
-  controllers: [],
+  controllers: [TestController],
 })
 export class AppModule {}

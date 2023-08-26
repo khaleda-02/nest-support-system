@@ -4,6 +4,7 @@ import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import * as dotenv from 'dotenv';
 import { UserModule } from '../user/user.module';
+import { EmailModule } from '../email/email.module';
 dotenv.config();
 @Module({
   imports: [
@@ -12,6 +13,7 @@ dotenv.config();
       signOptions: { expiresIn: '3600s' },
     }),
     UserModule,
+    EmailModule,
   ],
   controllers: [AuthController],
   providers: [AuthService],
