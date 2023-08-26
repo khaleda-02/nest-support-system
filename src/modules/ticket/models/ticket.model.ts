@@ -6,8 +6,13 @@ import {
   PrimaryKey,
   Table,
   Model,
+  BelongsTo,
+  ForeignKey,
+  HasMany,
 } from 'sequelize-typescript';
 import { Priority, Status } from 'src/common/enums';
+import { Comment } from 'src/modules/comment/models/comment.model';
+import { User } from 'src/modules/user/models/user.model';
 
 const { DATE, NUMBER, STRING, BOOLEAN } = DataType;
 
@@ -17,9 +22,6 @@ export class Ticket extends Model<Ticket> {
   @AutoIncrement
   @Column(NUMBER)
   id: number;
-
-  @Column(NUMBER)
-  userId: number;
 
   @Column(
     ENUM(
@@ -50,6 +52,16 @@ export class Ticket extends Model<Ticket> {
 
   @Column(NUMBER)
   categoryId: number;
+
+  @BelongsTo(() => User)
+  user: User;
+
+  @ForeignKey(() => User)
+  @Column(NUMBER)
+  userId: number;
+
+  @HasMany(() => Comment)
+  comments: Comment[];
 
   @Column(DATE)
   createdAt: Date;

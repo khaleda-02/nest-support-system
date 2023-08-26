@@ -20,7 +20,10 @@ export class AuthService {
     const isPasswordCorrect = await compare(password, userPassword);
     if (!isPasswordCorrect)
       throw new UnauthorizedException('wrong username or password');
-    return { user, accessToken: this.JwtService.sign(user) };
+    return {
+      user,
+      accessToken: this.JwtService.sign({ username: user.username }),
+    };
   }
 
   async register(registerDto: RegisterDto) {

@@ -9,7 +9,9 @@ import {
   Model,
   AutoIncrement,
 } from 'sequelize-typescript';
-import { Roles } from 'src/common/enums';
+import { Role, UserStatus } from 'src/common/enums';
+import { Comment } from 'src/modules/comment/models/comment.model';
+import { Ticket } from 'src/modules/ticket/models/ticket.model';
 
 const { DATE, NUMBER, STRING, BOOLEAN } = DataType;
 
@@ -28,10 +30,19 @@ export class User extends Model<User> {
   email: string;
 
   @Column(STRING)
+  firstname: string;
+
+  @Column(STRING)
+  lastname: string;
+
+  @Column(NUMBER)
+  phoneNumber: number;
+
+  @Column(STRING)
   password: string;
 
-  @Column(BOOLEAN)
-  verified: boolean;
+  @Column(ENUM(UserStatus.ACTIVE, UserStatus.DES_ACTIVE, UserStatus.PENDING))
+  status: UserStatus;
 
   @Column(STRING)
   otp: string;
@@ -39,8 +50,11 @@ export class User extends Model<User> {
   @Column(DATE)
   otpExpiry: Date;
 
-  @Column(ENUM(Roles.ADMIN, Roles.USER, Roles.STAFF))
-  roles: string;
+  @Column(ENUM(Role.ADMIN, Role.USER, Role.STAFF))
+  roles: Role;
+
+  @HasMany(() => Comment)
+  comments: Comment[];
 
   @Column(DATE)
   createdAt: Date;

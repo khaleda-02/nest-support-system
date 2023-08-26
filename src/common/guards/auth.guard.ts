@@ -1,17 +1,21 @@
-import { CanActivate, ExecutionContext } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Logger } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Observable } from 'rxjs';
 import { IS_PUBLIC_KEY } from '../contants';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { config } from 'dotenv';
+import { UserService } from 'src/modules/user/user.service';
 config();
 
 export class AuthGuard implements CanActivate {
-  constructor(private reflector: Reflector, private jwtService: JwtService) {}
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  private logger = new Logger(AuthGuard.name);
+
+  constructor(
+    private reflector: Reflector,
+    private jwtService: JwtService,
+    private userService: UserService,
+  ) {}
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     try {
       const isPublic = this.reflector.getAllAndOverride<boolean>(
         IS_PUBLIC_KEY,
@@ -23,11 +27,16 @@ export class AuthGuard implements CanActivate {
       const request = context.switchToHttp().getRequest();
       const token = this.extractToken(request);
 
-      const decodedUser = this.jwtService.verify(token, {
+      const { username } = this.jwtService.verify(token, {
         secret: process.env.JWT_SECRET,
       });
 
-      request['user'] = decodedUser;
+      //finding the user , and didn't store teh user in the token
+      // to get the lastest user info (because maybe the user's info got updated)
+      const user = await this.userService.findOne(username);
+      this.logger.log(`User form token  ${username}`);
+
+      request['user'] = user;
       return true;
     } catch (err) {
       return false;

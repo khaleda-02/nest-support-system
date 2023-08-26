@@ -20,7 +20,6 @@ export class TransformInterceptor<T>
     context: ExecutionContext,
     next: CallHandler<T>
   ): Observable<Response<T>> {
-    console.log('in intercpp before mapping ');
     return next.handle().pipe(
       map((data) => ({
         statusCode: context.switchToHttp().getResponse().statusCode,

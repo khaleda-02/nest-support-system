@@ -5,25 +5,24 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateTicketDto } from './dto/create-ticket.dto';
-import { UpdateTicketDto } from './dto/update-ticket.dto';
+import { CreateTicketDto } from '../dto/create-ticket.dto';
 import { TICKET_REPOSITORY } from 'src/common/contants';
 import { Transaction } from 'sequelize';
+import { UpdateTicketDto } from 'src/common/dtos/update-ticket.dto';
 
 @Injectable()
-export class TicketService {
+export class UserTicketService {
   private logger = new Logger();
   constructor(
     @Inject(TICKET_REPOSITORY)
     private ticketRepository,
   ) {}
 
-  // TODO: TOASK : how to check if the category exists
   async create(
     createTicketDto: CreateTicketDto,
     userId: number,
     transaction: Transaction,
-  ): Promise<CreateTicketDto> {
+  ) {
     const ticket = await this.ticketRepository.create(
       {
         ...createTicketDto,
@@ -75,4 +74,6 @@ export class TicketService {
     ticket.deletedBy = userId;
     return await ticket.destroy({ transaction });
   }
+
+  // async`?`
 }

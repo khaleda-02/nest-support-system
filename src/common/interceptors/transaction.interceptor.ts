@@ -18,7 +18,7 @@ export class TransactionInterceptor implements NestInterceptor {
 
   async intercept(
     context: ExecutionContext,
-    next: CallHandler<any>
+    next: CallHandler<any>,
   ): Promise<Observable<any>> {
     const req = context.switchToHttp().getRequest();
     const transaction: Transaction = await this.sequelize.transaction();
@@ -26,14 +26,14 @@ export class TransactionInterceptor implements NestInterceptor {
 
     return next.handle().pipe(
       tap(() => {
-        this.logger.debug('before commit transaction');
         transaction.commit();
+        this.logger.debug('Commit Transaction');
       }),
       catchError((err) => {
-        this.logger.debug('before rollback transaction');
+        this.logger.debug('Rollback transaction');
         transaction.rollback();
         throw err;
-      })
+      }),
     );
   }
 }
