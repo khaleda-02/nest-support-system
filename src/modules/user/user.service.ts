@@ -5,9 +5,9 @@ import {
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './models/user.model';
 import { USER_REPOSITORY } from 'src/common/contants';
+import { CreateUserDto } from 'src/common/dtos/create-user.dto';
 
 @Injectable()
 export class UserService {

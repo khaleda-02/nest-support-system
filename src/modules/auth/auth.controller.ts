@@ -1,8 +1,8 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
-import { RegisterDto } from './dto/Register.dto';
 import { AuthService } from './auth.service';
 import { Public } from '../../common/decorators/access.decorator';
+import { CreateUserDto } from 'src/common/dtos/create-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -16,7 +16,7 @@ export class AuthController {
 
   @Public()
   @Post('register')
-  async register(@Body() registerDto: RegisterDto) {
-    return await this.authService.register(registerDto);
+  async register(@Body() createUserDto: CreateUserDto) {
+    return await this.authService.register(createUserDto);
   }
 }

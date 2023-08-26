@@ -67,9 +67,15 @@ export class TicketController {
   @Post(':id/feedback')
   feedback(
     @Param('id', ParseIntPipe) id: number,
-    createFeedbackDto: CreateFeedbackDto,
+    @Body() createFeedbackDto: CreateFeedbackDto,
     @UserIdentity() user,
+    @TransactionDecorator() transaction: Transaction,
   ) {
-    // return this.ticketService.createFeedback(id, createFeedbackDto);
+    return this.ticketService.feedback(
+      id,
+      createFeedbackDto,
+      user.id,
+      transaction,
+    );
   }
 }
