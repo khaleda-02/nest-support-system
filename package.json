@@ -20,6 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "db:migrate": "ts-node node_modules/.bin/sequelize db:migrate",
     "db:migrate:undo": "ts-node node_modules/.bin/sequelize db:migrate:undo",
+    "db:migrate:undo:all": "ts-node node_modules/.bin/sequelize db:migrate:undo:all",
     "db:seed": "ts-node node_modules/.bin/sequelize db:seed:all",
     "db:seed:undo": "ts-node node_modules/.bin/sequelize db:seed:undo:all"
   },

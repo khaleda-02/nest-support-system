@@ -14,11 +14,24 @@ module.exports = {
         type: Sequelize.STRING,
         unique: true,
       },
-      email: {
+      firstname: {
         allowNull: false,
         type: Sequelize.STRING,
       },
+      lastname: {
+        allowNull: true,
+        type: Sequelize.STRING,
+      },
+      email: {
+        allowNull: false,
+        type: Sequelize.STRING,
+        unique: true,
+      },
       password: {
+        allowNull: false,
+        type: Sequelize.STRING,
+      },
+      phone_number: {
         allowNull: false,
         type: Sequelize.STRING,
       },

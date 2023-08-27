@@ -9,9 +9,12 @@ import {
   BelongsTo,
   ForeignKey,
   HasMany,
+  BelongsToMany,
 } from 'sequelize-typescript';
 import { Priority, Status } from 'src/common/enums';
 import { Comment } from 'src/modules/comment/models/comment.model';
+import { Tag } from 'src/modules/tag/models/tag.model';
+import { TicketTag } from 'src/modules/tag/models/ticket-tag.model';
 import { User } from 'src/modules/user/models/user.model';
 
 const { DATE, NUMBER, STRING, BOOLEAN } = DataType;
@@ -62,6 +65,10 @@ export class Ticket extends Model<Ticket> {
 
   @HasMany(() => Comment)
   comments: Comment[];
+
+  //! TicketsTags association
+  @BelongsToMany(() => Tag, () => TicketTag)
+  tags: Tag[];
 
   @Column(DATE)
   createdAt: Date;

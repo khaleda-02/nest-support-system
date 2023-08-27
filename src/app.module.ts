@@ -9,17 +9,21 @@ import { AdminModule } from './modules/admin/admin.module';
 import { CommentModule } from './modules/comment/comment.module';
 import { EmailModule } from './modules/email/email.module';
 import { TestController } from './test.controller';
+import { TagModule } from './modules/tag/tag.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, load: config }),
-    DatabaseModule,
-    AuthModule,
-    UserModule,
-    TicketModule,
-    AdminModule,
-    CommentModule,
+    DatabaseModule, // main module
+    AuthModule, // main module
+    UserModule, // main module
+    TicketModule, // main module
+    AdminModule, // main module
+    // staff
+    CommentModule, // made it a separated module for scalability [so we can add a replies feature in the future]
+    // communication
     EmailModule,
+    TagModule,
   ],
   controllers: [TestController],
 })

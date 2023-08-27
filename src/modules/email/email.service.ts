@@ -21,6 +21,8 @@ export class EmailService {
     if (!user) throw new NotFoundException('User not found');
     const to = user.email;
     await sendEmail({ subject, from: 'khaleda.02f@gmail.com', to, text });
+
+    //TODO: add the new eamil into the table
     this.logger.log(`Email Sent to ${to}`);
   }
 
