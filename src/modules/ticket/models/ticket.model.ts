@@ -67,8 +67,10 @@ export class Ticket extends Model<Ticket> {
   comments: Comment[];
 
   //! TicketsTags association
-  @BelongsToMany(() => Tag, () => TicketTag)
-  tags: Tag[];
+  @HasMany(() => TicketTag)
+  TicketTag: TicketTag[];
+  // @BelongsToMany(() => Tag, () => TicketTag)
+  // tags: Tag[];
 
   @Column(DATE)
   createdAt: Date;

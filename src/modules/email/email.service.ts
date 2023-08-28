@@ -14,7 +14,10 @@ import { IEmailOptions } from 'src/common/interfaces';
 @Injectable()
 export class EmailService {
   private logger = new Logger();
-  constructor(private userService: UserService) {}
+  constructor(
+    @Inject(forwardRef(() => UserService))
+    private userService: UserService,
+  ) {}
 
   async send(userId: number, subject: string, text: string) {
     const user = await this.userService.findOneById(userId);

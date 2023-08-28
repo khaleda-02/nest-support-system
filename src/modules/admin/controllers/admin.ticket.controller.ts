@@ -25,7 +25,7 @@ export class AdminTicketController {
 
   @Get()
   findAll() {
-    return this.adminTicketService.findAll();
+    // return this.adminTicketService.findAll();
   }
 
   @Get(':id')

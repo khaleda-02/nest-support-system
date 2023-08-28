@@ -3,6 +3,8 @@ import { CreateTagDto } from './dto/create-tag.dto';
 import { TAG_REPOSITORY, TICKET_TAG__REPOSITORY } from 'src/common/contants';
 import { Transaction } from 'sequelize';
 import { TicketTag } from './models/ticket-tag.model';
+import { Tag } from './models/tag.model';
+import { Ticket } from '../ticket/models/ticket.model';
 
 @Injectable()
 export class TagService {
@@ -32,27 +34,9 @@ export class TagService {
 
   async tagATicket(tagId: number, ticketId: number, userId: number) {
     //verify if the ticket is own for the user and the ticket existing
-    // const TicketTag = await this.ticketTagRepository.create({
-    //   tagId,
-    //   ticketId,
-    // });
-    // console.log('in tag ticket fun ', TicketTag);
-
-    const tags = await this.tagRepository.findAll();
-    console.log(tags);
-    console.log('----------------------------------------------------------');
-
-    const test = await this.ticketTagRepository.findAll({
+    const test = await this.ticketTagRepository.scope('withTag').findAll({
       where: { tagId },
-      include: [
-        {
-          model: TicketTag,
-          // attributes: ['id', 'first_name', 'last_name', 'email'],
-        },
-      ],
     });
-    console.log('after incule ----------------- ', test);
-
-    return `This action returns a #${tagId} tag`;
+    return test;
   }
 }

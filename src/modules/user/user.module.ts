@@ -4,7 +4,7 @@ import { userProviders } from './user.providers';
 import { EmailModule } from '../email/email.module';
 
 @Module({
-  // imports: [forwardRef(() => EmailModule)], 
+  imports: [forwardRef(() => EmailModule)], 
   providers: [UserService, ...userProviders],
   exports: [UserService],
 })

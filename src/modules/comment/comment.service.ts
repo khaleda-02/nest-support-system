@@ -13,7 +13,7 @@ export class CommentService {
       ticketId,
       userId,
     });
-    //todo: send an eamil for the userID 
+    //todo: send an eamil for the userID
   }
 
   findAll(ticketId: number) {

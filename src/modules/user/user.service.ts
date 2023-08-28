@@ -18,7 +18,9 @@ export class UserService {
   private readonly logger = new Logger(UserService.name);
   constructor(
     @Inject(USER_REPOSITORY)
-    private userRepository, // private emailService: EmailService
+    private userRepository,
+    @Inject(forwardRef(() => EmailService))
+    private emailService: EmailService,
   ) {}
 
   //! Base Methods

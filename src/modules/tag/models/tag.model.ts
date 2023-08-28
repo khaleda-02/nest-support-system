@@ -5,6 +5,7 @@ import {
   Column,
   DataType,
   ForeignKey,
+  HasMany,
   Model,
   PrimaryKey,
   Table,
@@ -25,6 +26,7 @@ export class Tag extends Model<Tag> {
   @Column(STRING)
   name: string;
 
+  //! User association
   @BelongsTo(() => User)
   user: User;
 
@@ -32,15 +34,17 @@ export class Tag extends Model<Tag> {
   @Column(NUMBER)
   userId: number;
 
+  //! TicketsTags association
+  @HasMany(() => TicketTag)
+  TicketTags: TicketTag[];
+  // @BelongsToMany(() => Ticket, () => TicketTag)
+  // tickets: Ticket[];
+
   @Column(DATE)
   createdAt: Date;
 
   @Column(STRING)
   createdBy: string;
-
-  //! TicketsTags association
-  @BelongsToMany(() => Ticket, () => TicketTag)
-  tickets: Ticket[];
 
   @Column(DATE)
   updatedAt: Date;

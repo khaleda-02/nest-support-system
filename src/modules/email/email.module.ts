@@ -4,8 +4,8 @@ import { EmailService } from './email.service';
 
 @Global()
 @Module({
-  // imports: [forwardRef(() => UserModule)],
-  imports: [UserModule],
+  imports: [forwardRef(() => UserModule)],
+  // imports: [UserModule],
   providers: [EmailService],
   exports: [EmailService],
 })

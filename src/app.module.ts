@@ -18,7 +18,7 @@ import { TagModule } from './modules/tag/tag.module';
     AuthModule, // main module
     UserModule, // main module
     TicketModule, // main module
-    AdminModule, // main module
+    AdminModule, // main module + add staff here 
     // staff
     CommentModule, // made it a separated module for scalability [so we can add a replies feature in the future]
     // communication
