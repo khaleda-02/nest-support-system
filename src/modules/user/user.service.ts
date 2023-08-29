@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   Logger,
+  NotFoundException,
   UnauthorizedException,
   forwardRef,
 } from '@nestjs/common';
@@ -37,20 +38,23 @@ export class UserService {
       otp: hashedOtp,
       otpExpiry: Date.now() + 3600000,
     });
-    // await this.emailService.userConfirmation(user.id, otp);
+
+    await this.emailService.userConfirmation(newUser.id, otp);
 
     return newUser.get({ plain: true });
   }
 
   async findOne(username: string): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { username } });
-    if (!user) throw new UnauthorizedException('wrong username or password');
+    const user = await this.userRepository
+      .scope('login')
+      .findOne({ where: { username } });
+    if (!user) throw new NotFoundException('user not found');
     return user.get({ plain: true });
   }
 
   async findOneById(id: number): Promise<User> {
     const user = await this.userRepository.findOne({ where: { id } });
-    if (!user) throw new UnauthorizedException('wrong username or password');
+    if (!user) throw new NotFoundException('user not found');
     return user;
   }
 }

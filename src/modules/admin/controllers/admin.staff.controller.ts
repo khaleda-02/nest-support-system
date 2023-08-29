@@ -1,29 +1,36 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Delete, Get, Param, ParseIntPipe } from '@nestjs/common';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Role } from 'src/common/enums';
+import { AdminService } from '../services/admin.service';
 
+@Roles(Role.ADMIN)
 @Controller('admins/staffs')
 export class AdminStaffController {
-  constructor() {}
+  constructor(private adminService: AdminService) {}
+  @Get(':userId')
+  invite(@Param('userId', ParseIntPipe) userId: number) {
+    return this.adminService.invite(userId);
+  }
 
-  @Post()
-  create(@Body() createAdminDto) {}
+  @Get(':userId')
+  remove(@Param('userId', ParseIntPipe) userId: number) {
+    return this.adminService.remove(userId);
+  }
 
-  @Get()
-  findAll() {}
+  // admins/staffs/12/tickets/12
+  @Get(':staffId/tickets/:ticketId')
+  assign(
+    @Param('staffId', ParseIntPipe) staffId: number,
+    @Param('ticketId', ParseIntPipe) ticketId: number,
+  ) {
+    return this.adminService.assign(staffId, ticketId);
+  }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {}
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAdminDto) {}
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {}
+  @Delete(':staffId/tickets/:ticketId')
+  unAssign(
+    @Param('staffId', ParseIntPipe) staffId: number,
+    @Param('ticketId', ParseIntPipe) ticketId: number,
+  ) {
+    return this.adminService.unAssign(staffId, ticketId);
+  }
 }

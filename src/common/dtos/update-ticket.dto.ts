@@ -1,4 +1,10 @@
-import { IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
+import {
+  IsDateString,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  MinDate,
+} from 'class-validator';
 import { Priority, Status } from 'src/common/enums';
 
 export class UpdateTicketDto {
@@ -11,4 +17,9 @@ export class UpdateTicketDto {
   @IsNotEmpty()
   @IsEnum(Priority)
   priority: Priority;
+  
+  @IsOptional()
+  @IsDateString()
+  @MinDate(new Date())
+  date: Date;
 }

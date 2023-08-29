@@ -1,4 +1,4 @@
-import { TAG_REPOSITORY, TICKET_TAG__REPOSITORY } from 'src/common/contants';
+import { TAG_REPOSITORY, TICKET_TAG_REPOSITORY } from 'src/common/contants';
 import { Tag } from '../models/tag.model';
 import { TicketTag } from '../models/ticket-tag.model';
 
@@ -8,7 +8,7 @@ export const tagProviders = [
     useValue: Tag,
   },
   {
-    provide: TICKET_TAG__REPOSITORY,
+    provide: TICKET_TAG_REPOSITORY,
     useValue: TicketTag,
   },
 ];

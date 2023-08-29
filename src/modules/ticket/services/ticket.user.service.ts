@@ -11,6 +11,7 @@ import { Transaction } from 'sequelize';
 import { UpdateTicketDto } from 'src/common/dtos/update-ticket.dto';
 import { CreateFeedbackDto } from '../dto/create-feedback.dto';
 import { Status } from 'src/common/enums';
+import { EmailService } from 'src/modules/email/email.service';
 
 @Injectable()
 export class UserTicketService {
@@ -18,6 +19,7 @@ export class UserTicketService {
   constructor(
     @Inject(TICKET_REPOSITORY)
     private ticketRepository,
+    private emailService: EmailService,
   ) {}
 
   async create(
@@ -32,7 +34,7 @@ export class UserTicketService {
       },
       { transaction },
     );
-
+    await this.emailService.newTicketEmail(userId , ticket.title);
     return ticket;
   }
 

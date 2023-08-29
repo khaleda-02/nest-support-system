@@ -1,16 +1,9 @@
 import { Inject, Injectable, NotFoundException, Options } from '@nestjs/common';
 import { TICKET_REPOSITORY } from 'src/common/contants';
-import {
-  FindOptions,
-  Transaction,
-  WhereOperators,
-  WhereOptions,
-} from 'sequelize';
+import { FindOptions, Transaction } from 'sequelize';
 import { UpdateTicketDto } from 'src/common/dtos/update-ticket.dto';
+import { ScheduleTicketDto } from 'src/common/dtos/schedule-ticket.dto';
 
-// ToDo : how to deal with multiple roles in services
-// ToDo : toask can the admin and staff create and remove tickets.
-// ToDo : toask can the admin and staff update the priority of a ticket .
 @Injectable()
 export class AdminTicketService {
   constructor(
@@ -18,10 +11,8 @@ export class AdminTicketService {
     private ticketRepository,
   ) {}
 
-  async findAll(options: FindOptions) {
-    // staff => assigned ticket
-    // admin => all
-    return await this.ticketRepository.findAll(options);
+  async findAll() {
+    return await this.ticketRepository.findAll();
   }
 
   async findOne(id: number) {
@@ -34,7 +25,7 @@ export class AdminTicketService {
 
   async update(
     id: number,
-    updateTicketDto: UpdateTicketDto,
+    ticketDto: UpdateTicketDto | ScheduleTicketDto, // date for schudling ticket in staff cases
     userId: number,
     transaction: Transaction,
   ) {
@@ -45,7 +36,7 @@ export class AdminTicketService {
     if (!ticket) throw new NotFoundException('ticket not found');
 
     return await ticket.update(
-      { ...updateTicketDto, updatedAt: new Date(), updatedBy: userId },
+      { ...ticketDto, updatedAt: new Date(), updatedBy: userId },
       { transaction },
     );
   }

@@ -12,7 +12,6 @@ export class AuthService {
   constructor(
     private userService: UserService,
     private JwtService: JwtService,
-    private emailService: EmailService,
   ) {}
 
   async login({ username, password }: LoginDto) {
@@ -34,7 +33,6 @@ export class AuthService {
     const { password, otp, ...user } = await this.userService.create(
       createUserDto,
     );
-    await this.emailService.userConfirmation(user.id, otp);
     return user;
   }
 }

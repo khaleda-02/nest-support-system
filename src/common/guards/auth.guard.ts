@@ -33,9 +33,8 @@ export class AuthGuard implements CanActivate {
 
       //finding the user , and didn't store teh user in the token
       // to get the lastest user info (because maybe the user's info got updated)
-      const user = await this.userService.findOne(username);
-      this.logger.log(`User form token  ${username}`);
-
+      const { password, ...user } = await this.userService.findOne(username);
+      if (!user) return false;
       request['user'] = user;
       return true;
     } catch (err) {

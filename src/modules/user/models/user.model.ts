@@ -8,15 +8,40 @@ import {
   Unique,
   Model,
   AutoIncrement,
+  Scopes,
 } from 'sequelize-typescript';
 import { Role, UserStatus } from 'src/common/enums';
+import { StaffsTicket } from 'src/modules/admin/models/staff-ticket.model';
 import { Comment } from 'src/modules/comment/models/comment.model';
 import { Email } from 'src/modules/email/models/email.model';
-import { Ticket } from 'src/modules/ticket/models/ticket.model';
 
 const { DATE, NUMBER, STRING, BOOLEAN } = DataType;
+const exculededDates = [
+  'createdAt',
+  'updatedAt',
+  'createdBy',
+  'updatedBy',
+  'deletedAt',
+  'deletedBy',
+];
 
-@Table({ underscored: true, paranoid: true, tableName: 'Users' })
+@Scopes(() => ({
+  login: {
+    attributes: {
+      exclude: [...exculededDates, 'otp', 'otpExpiry'], // get all attributes for admins
+    },
+  },
+}))
+@Table({
+  underscored: true,
+  paranoid: true,
+  tableName: 'Users',
+  defaultScope: {
+    attributes: {
+      exclude: [...exculededDates, 'password'],
+    },
+  },
+})
 export class User extends Model<User> {
   @PrimaryKey
   @AutoIncrement
@@ -27,6 +52,7 @@ export class User extends Model<User> {
   @Column(STRING)
   username: string;
 
+  @Unique
   @Column(STRING)
   email: string;
 
@@ -56,6 +82,10 @@ export class User extends Model<User> {
 
   @HasMany(() => Comment)
   comments: Comment[];
+
+  //! StaffTicket association
+  @HasMany(() => StaffsTicket)
+  staffsTicket: StaffsTicket[];
 
   @HasMany(() => Email)
   emails: Email[];

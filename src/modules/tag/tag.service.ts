@@ -1,6 +1,6 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { CreateTagDto } from './dto/create-tag.dto';
-import { TAG_REPOSITORY, TICKET_TAG__REPOSITORY } from 'src/common/contants';
+import { TAG_REPOSITORY, TICKET_TAG_REPOSITORY } from 'src/common/contants';
 import { Transaction } from 'sequelize';
 import { TicketTag } from './models/ticket-tag.model';
 import { Tag } from './models/tag.model';
@@ -9,7 +9,7 @@ import { Ticket } from '../ticket/models/ticket.model';
 @Injectable()
 export class TagService {
   constructor(
-    @Inject(TICKET_TAG__REPOSITORY)
+    @Inject(TICKET_TAG_REPOSITORY)
     private ticketTagRepository,
     @Inject(TAG_REPOSITORY)
     private tagRepository,
