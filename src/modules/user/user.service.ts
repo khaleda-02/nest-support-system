@@ -11,8 +11,14 @@ import { User } from './models/user.model';
 import { USER_REPOSITORY } from 'src/common/contants';
 import { CreateUserDto } from 'src/common/dtos/create-user.dto';
 import { EmailService } from '../email/email.service';
-import { hash } from 'bcrypt';
+import { hash, compare } from 'bcrypt';
 import { OTPCodeGenerator } from 'src/util';
+import { UpdateUserDto } from './dto/update-user-info.dto';
+import { Role, UserStatus } from 'src/common/enums';
+interface IUserInfo {
+  roles?: Role;
+  status?: UserStatus;
+}
 
 @Injectable()
 export class UserService {
@@ -33,13 +39,14 @@ export class UserService {
 
     const otp = OTPCodeGenerator();
     const hashedOtp = await hash(`${otp}`, 10);
+    createUserDto.password = await hash(createUserDto.password, 10);
     const newUser = await this.userRepository.create({
       ...createUserDto,
       otp: hashedOtp,
       otpExpiry: Date.now() + 3600000,
     });
 
-    await this.emailService.userConfirmation(newUser.id, otp);
+    await this.emailService.sendOtp(newUser.id, otp);
 
     return newUser.get({ plain: true });
   }
@@ -52,9 +59,43 @@ export class UserService {
     return user.get({ plain: true });
   }
 
+  //! Helper Functions
   async findOneById(id: number): Promise<User> {
     const user = await this.userRepository.findOne({ where: { id } });
     if (!user) throw new NotFoundException('user not found');
+    return user;
+  }
+
+  // func => change the user's status and rolse .
+  async verifyAndUpdateUser(id: number, otp: string, data: IUserInfo) {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) throw new NotFoundException('user not found');
+    const isVerified = await compare(otp, user.otp);
+    if (!isVerified) throw new BadRequestException('otp not valid');
+    await user.update({ ...data });
+    return user;
+  }
+
+  // async verifyUser(id: number, otp: string) {
+  //   const user = await this.userRepository.findOne({ where: { id } });
+  //   if (!user) throw new NotFoundException('user not found');
+  //   const isVerified = await compare(otp, user.otp);
+  //   user.status = UserStatus.ACTIVE;
+  //   await user.save();
+  //   return isVerified;
+  // }
+  // func => make an otp for a user : verify him && invite & accept staffs
+  async createAndSendOtp(id: number) {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) throw new NotFoundException('user not found');
+    const otp = OTPCodeGenerator();
+    const hashedOtp = await hash(`${otp}`, 10);
+    await user.update({
+      otp: hashedOtp,
+      otpExpiry: Date.now() + 3600000,
+    });
+    await this.emailService.sendOtp(user.id, otp);
+
     return user;
   }
 }

@@ -78,8 +78,8 @@ export class AdminService {
 
   //! admin services
   async invite(userId: number) {
-    await this.userService.findOneById(userId);
-    await this.emailService.staffInvitation(userId, 12);
+    await this.userService.createAndSendOtp(userId);
+    // await this.userService.findOneByIdAndUpdate(userId, { roles: Role.STAFF });
   }
 
   //Todo: ask hatem ,what's should happen if the staff assigns to a ticket ,

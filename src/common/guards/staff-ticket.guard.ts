@@ -13,12 +13,13 @@ export class AssignedStaffGuard implements CanActivate {
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     try {
-      const isStaffAssignTicket = this.reflector.getAllAndOverride<boolean>(
-        IS_STAFF_ASSIGN_TECKET_KEY,
-        [context.getClass(), context.getHandler()],
-      );
+      const isStaffAssignmentRequired =
+        this.reflector.getAllAndOverride<boolean>(IS_STAFF_ASSIGN_TECKET_KEY, [
+          context.getClass(),
+          context.getHandler(),
+        ]);
 
-      if (!isStaffAssignTicket) return true;
+      if (!isStaffAssignmentRequired) return true;
 
       const request = context.switchToHttp().getRequest();
       const user = request.user;

@@ -30,13 +30,12 @@ export class EmailService {
     this.logger.log(`Email Sent to ${to}`);
   }
 
-  //? USER EMAILS :
-  // const url = `examplee.com/auth/confirm?token=${token}`;
-  async userConfirmation(userId: number, otp: number) {
+  // user verification , statff creation
+  async sendOtp(userId: number, otp: number) {
     await this.send(
       userId,
-      'User Confirmation',
-      `Your code is: ${otp} , one hour to exiper `,
+      'Staff Invitation',
+      `Hey ,your code ${otp} , valid in an hour `,
     );
   }
 
@@ -56,16 +55,6 @@ export class EmailService {
     );
   }
 
-  //? STAFF EMAILS :
-  async staffInvitation(userId: number, otp: number) {
-    await this.send(
-      userId,
-      'Staff Invitation',
-      `Hey ,Congrat we would like to invite you to our system as a staff member
-        for confirmation please accept the invitation with this code ${otp}
-      `,
-    );
-  }
   async AssignTicket(userId: number) {
     await this.send(
       userId,

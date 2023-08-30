@@ -29,7 +29,6 @@ export class AuthService {
   }
 
   async register(createUserDto: CreateUserDto) {
-    createUserDto.password = await hash(createUserDto.password, 10);
     const { password, otp, ...user } = await this.userService.create(
       createUserDto,
     );
