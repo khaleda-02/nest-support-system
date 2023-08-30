@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { CacheModule } from '@nestjs/cache-manager';
 import { ConfigModule } from '@nestjs/config';
 import config from '../config';
 import { AuthModule } from './modules/auth/auth.module';
@@ -12,13 +13,13 @@ import { TagModule } from './modules/tag/tag.module';
 
 @Module({
   imports: [
+    CacheModule.register(),
     ConfigModule.forRoot({ isGlobal: true, load: config }),
-    DatabaseModule, // main module
-    AuthModule, // main module
-    UserModule, // main module
-    TicketModule, // main module
-    AdminModule, // main module + add staff here
-    // communication
+    DatabaseModule,
+    AuthModule,
+    UserModule,
+    TicketModule,
+    AdminModule,
     EmailModule,
     TagModule,
   ],

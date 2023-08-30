@@ -133,15 +133,12 @@ export class AdminService {
     staffId: number,
     ticketId: number,
   ): Promise<boolean> {
-    console.log('staffId: ', staffId);
-    console.log('ticketId: ', ticketId);
     const ticket = await this.staffTicketRepository.findOne({
       where: {
         ticketId,
         staffId,
       },
     });
-    console.log('in isstaff a ticket fun', ticket);
     if (!ticket) return false;
     return true;
   }
