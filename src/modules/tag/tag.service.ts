@@ -2,9 +2,7 @@ import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { TAG_REPOSITORY, TICKET_TAG_REPOSITORY } from 'src/common/contants';
 import { Transaction } from 'sequelize';
-import { TicketTag } from './models/ticket-tag.model';
-import { Tag } from './models/tag.model';
-import { Ticket } from '../ticket/models/ticket.model';
+import { UserTicketService } from 'src/modules/ticket/services/ticket.user.service';
 
 @Injectable()
 export class TagService {
@@ -13,6 +11,7 @@ export class TagService {
     private ticketTagRepository,
     @Inject(TAG_REPOSITORY)
     private tagRepository,
+    private ticketService: UserTicketService,
   ) {}
 
   async create(
@@ -28,15 +27,15 @@ export class TagService {
   }
 
   async findAllTicketTags(ticketId: number, userId: number) {
-    // const
-    return await this.tagRepository.findAll();
+    await this.ticketService.findOne(ticketId, userId);
+    const tickets = await this.ticketTagRepository.scope('withTag').findAll({
+      where: { ticketId },
+    });
+    return tickets;
   }
 
   async tagATicket(tagId: number, ticketId: number, userId: number) {
-    //verify if the ticket is own for the user and the ticket existing
-    const test = await this.ticketTagRepository.scope('withTag').findAll({
-      where: { tagId },
-    });
-    return test;
+    await this.ticketService.findOne(ticketId, userId);
+    return await this.ticketTagRepository.create({ tagId, ticketId });
   }
 }

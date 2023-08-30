@@ -8,8 +8,8 @@ import {
   Delete,
   ParseIntPipe,
 } from '@nestjs/common';
-import { CommentService } from './comment.service';
-import { CreateCommentDto } from './dto/create-comment.dto';
+import { CommentService } from '../services/comment.service';
+import { CreateCommentDto } from '../dto/create-comment.dto';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/enums';
 import { UserIdentity } from 'src/common/decorators/user.decorator';

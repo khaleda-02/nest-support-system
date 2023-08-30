@@ -15,6 +15,7 @@ import { hash, compare } from 'bcrypt';
 import { OTPCodeGenerator } from 'src/util';
 import { UpdateUserDto } from './dto/update-user-info.dto';
 import { Role, UserStatus } from 'src/common/enums';
+import { Transaction } from 'sequelize';
 interface IUserInfo {
   roles?: Role;
   status?: UserStatus;
@@ -67,23 +68,21 @@ export class UserService {
   }
 
   // func => change the user's status and rolse .
-  async verifyAndUpdateUser(id: number, otp: string, data: IUserInfo) {
+  async verifyAndUpdateUser(
+    id: number,
+    otp: string,
+    data: IUserInfo,
+    transaction: Transaction,
+  ) {
     const user = await this.userRepository.findOne({ where: { id } });
     if (!user) throw new NotFoundException('user not found');
     const isVerified = await compare(otp, user.otp);
-    if (!isVerified) throw new BadRequestException('otp not valid');
-    await user.update({ ...data });
+    if (!isVerified || user.otpExpiry < Date.now())
+      throw new BadRequestException('otp not valid');
+    await user.update({ ...data }, { transaction });
     return user;
   }
 
-  // async verifyUser(id: number, otp: string) {
-  //   const user = await this.userRepository.findOne({ where: { id } });
-  //   if (!user) throw new NotFoundException('user not found');
-  //   const isVerified = await compare(otp, user.otp);
-  //   user.status = UserStatus.ACTIVE;
-  //   await user.save();
-  //   return isVerified;
-  // }
   // func => make an otp for a user : verify him && invite & accept staffs
   async createAndSendOtp(id: number) {
     const user = await this.userRepository.findOne({ where: { id } });

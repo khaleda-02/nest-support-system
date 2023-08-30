@@ -9,14 +9,14 @@ import {
   UseInterceptors,
   ParseIntPipe,
 } from '@nestjs/common';
-import { CreateTicketDto } from './dto/create-ticket.dto';
+import { CreateTicketDto } from '../dto/create-ticket.dto';
 import { UserIdentity } from 'src/common/decorators/user.decorator';
 import { TransactionInterceptor } from 'src/common/interceptors/transaction.interceptor';
 import { Transaction } from 'sequelize';
 import { TransactionDecorator } from 'src/common/decorators/transaction.decorator';
-import { UserTicketService } from './services';
+import { UserTicketService } from '../services';
 import { UpdateTicketDto } from 'src/common/dtos/update-ticket.dto';
-import { CreateFeedbackDto } from './dto/create-feedback.dto';
+import { CreateFeedbackDto } from '../dto/create-feedback.dto';
 import { Role } from 'src/common/enums';
 import { Roles } from 'src/common/decorators/roles.decorator';
 

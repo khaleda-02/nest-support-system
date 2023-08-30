@@ -17,7 +17,6 @@ export class AdminStaffController {
     return this.adminService.remove(userId);
   }
 
-  // admins/staffs/12/tickets/12
   @Get(':staffId/tickets/:ticketId')
   assign(
     @Param('staffId', ParseIntPipe) staffId: number,

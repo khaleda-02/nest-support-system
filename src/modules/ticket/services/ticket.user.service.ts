@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Inject,
   Injectable,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateTicketDto } from '../dto/create-ticket.dto';
@@ -15,7 +14,6 @@ import { EmailService } from 'src/modules/email/email.service';
 
 @Injectable()
 export class UserTicketService {
-  private logger = new Logger();
   constructor(
     @Inject(TICKET_REPOSITORY)
     private ticketRepository,
@@ -34,7 +32,7 @@ export class UserTicketService {
       },
       { transaction },
     );
-    await this.emailService.newTicketEmail(userId , ticket.title);
+    await this.emailService.newTicketEmail(userId, ticket.title);
     return ticket;
   }
 
@@ -45,6 +43,14 @@ export class UserTicketService {
   async findOne(id: number, userId: number) {
     const ticket = await this.ticketRepository.findOne({
       where: { id, userId },
+    });
+    if (!ticket) throw new NotFoundException('ticket not found');
+    return ticket;
+  }
+
+  async findOneById(id: number) {
+    const ticket = await this.ticketRepository.findOne({
+      where: { id },
     });
     if (!ticket) throw new NotFoundException('ticket not found');
     return ticket;
@@ -62,10 +68,12 @@ export class UserTicketService {
 
     if (!ticket) throw new NotFoundException('ticket not found');
 
-    return await ticket.update(
+    const updatedTicket = await ticket.update(
       { ...updateTicketDto, updatedAt: new Date(), updatedBy: userId },
       { transaction },
     );
+    this.emailService.ticketUpdated(updatedTicket.userId, updatedTicket.title);
+    return updatedTicket;
   }
 
   async remove(id: number, userId: number, transaction: Transaction) {

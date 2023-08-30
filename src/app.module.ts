@@ -6,7 +6,6 @@ import { UserModule } from './modules/user/user.module';
 import { DatabaseModule } from './modules/database/database.module';
 import { TicketModule } from './modules/ticket/ticket.module';
 import { AdminModule } from './modules/admin/admin.module';
-import { CommentModule } from './modules/comment/comment.module';
 import { EmailModule } from './modules/email/email.module';
 import { TestController } from './test.controller';
 import { TagModule } from './modules/tag/tag.module';
@@ -18,9 +17,7 @@ import { TagModule } from './modules/tag/tag.module';
     AuthModule, // main module
     UserModule, // main module
     TicketModule, // main module
-    AdminModule, // main module + add staff here 
-    // staff
-    CommentModule, // made it a separated module for scalability [so we can add a replies feature in the future]
+    AdminModule, // main module + add staff here
     // communication
     EmailModule,
     TagModule,

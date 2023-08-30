@@ -75,6 +75,9 @@ export class StaffController {
   accept(
     @Param('userId', ParseIntPipe) userId: number,
     @UserIdentity() user,
+    @Body('otp') otp: string,
     @TransactionDecorator() transaction: Transaction,
-  ) {}
+  ) {
+    return this.adminService.accept(userId, otp, transaction);
+  }
 }

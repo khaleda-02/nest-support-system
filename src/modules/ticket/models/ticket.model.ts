@@ -13,9 +13,9 @@ import {
 } from 'sequelize-typescript';
 import { Priority, Status } from 'src/common/enums';
 import { StaffsTicket } from 'src/modules/admin/models/staff-ticket.model';
-import { Comment } from 'src/modules/comment/models/comment.model';
 import { TicketTag } from 'src/modules/tag/models/ticket-tag.model';
 import { User } from 'src/modules/user/models/user.model';
+import { Comment } from './comment.model';
 
 const { DATE, NUMBER, STRING, BOOLEAN } = DataType;
 

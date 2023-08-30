@@ -12,7 +12,7 @@ import {
 } from 'sequelize-typescript';
 import { Role, UserStatus } from 'src/common/enums';
 import { StaffsTicket } from 'src/modules/admin/models/staff-ticket.model';
-import { Comment } from 'src/modules/comment/models/comment.model';
+import { Comment } from 'src/modules/ticket/models/comment.model';
 import { Email } from 'src/modules/email/models/email.model';
 
 const { DATE, NUMBER, STRING, BOOLEAN } = DataType;

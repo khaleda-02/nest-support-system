@@ -1,14 +1,10 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { FindOptions, Transaction } from 'sequelize';
-import {
-  STAFF_TICKET__REPOSITORY,
-  TICKET_REPOSITORY,
-} from 'src/common/contants';
+import { Transaction } from 'sequelize';
+import { STAFF_TICKET__REPOSITORY } from 'src/common/contants';
 import { ScheduleTicketDto } from 'src/common/dtos/schedule-ticket.dto';
 import { UpdateTicketDto } from 'src/common/dtos/update-ticket.dto';
 import { Role } from 'src/common/enums';
 import { EmailService } from 'src/modules/email/email.service';
-import { Ticket } from 'src/modules/ticket/models/ticket.model';
 import { AdminTicketService } from 'src/modules/ticket/services';
 import { User } from 'src/modules/user/models/user.model';
 import { UserService } from 'src/modules/user/user.service';
@@ -23,7 +19,6 @@ export class AdminService {
     private emailService: EmailService,
   ) {}
 
-  //! tickets sercices
   async findAll(user: User) {
     if (user.roles.includes(Role.STAFF)) {
       return await this.staffTicketRepository.scope('withTicket').findAll({
@@ -55,34 +50,27 @@ export class AdminService {
       user.id,
       transactions,
     );
-    // todo askhatem , here I just send an email just in status update case ,
-    // do I need to send an email in all cases {status , priority , scheduled}
-    if ('status' in ticketDto) {
-      this.emailService.ticketUpdated(
-        updatedTicket.userId,
-        updatedTicket.title,
-      );
-    }
     return updatedTicket
       ? `ticket ${ticketId} updated successfully`
       : new BadRequestException();
   }
 
   //! staff serciess
-  async accept() {
-    // get the OTP from body ,
-    // verify it , then add the user into staff table ,
-    // change the role of him
-    // TODO verify the otp , chagne the user's role to staff
+  async accept(userId: number, otp: string, transaction: Transaction) {
+    await this.userService.verifyAndUpdateUser(
+      userId,
+      otp,
+      { roles: Role.STAFF },
+      transaction,
+    );
   }
 
   //! admin services
   async invite(userId: number) {
     await this.userService.createAndSendOtp(userId);
-    // await this.userService.findOneByIdAndUpdate(userId, { roles: Role.STAFF });
   }
 
-  //Todo: ask hatem ,what's should happen if the staff assigns to a ticket ,
+  //Todo: askhatem ,what's should happen if the staff assigns to a ticket ,
   // and how can I chage the status of each ticket was assigned to that staff . maybe a map
   async remove(userId: number) {
     // find
@@ -90,14 +78,16 @@ export class AdminService {
     // destory
     // TODO change the user role => staff to user , and  re open the
   }
+
   async assign(staffId: number, ticketId: number) {
+    // ماش المفروض اني
+    // it's suppord that when I try to add a non exists staff here, gives me an error , bevause of the forign key
     // TODO askhatem is this checking if the user role => staff & checking from the ticket if exists good practice
     const user = await this.userService.findOneById(staffId);
     if (!user || !user.roles.includes(Role.STAFF))
       throw new BadRequestException(`staff not found`);
 
-    const ticket = await this.ticketService.findOne(ticketId);
-    if (!ticket) throw new BadRequestException(`ticket not found`);
+    await this.ticketService.findOne(ticketId);
 
     const isAssigned = await this.staffTicketRepository.findOne({
       where: {
@@ -111,6 +101,7 @@ export class AdminService {
       staffId,
       ticketId,
     });
+    await this.emailService.AssignTicket(user.id);
     return staffTicket;
     // todo : corn job , email the staff after 2 daysschedule
   }
@@ -137,17 +128,20 @@ export class AdminService {
       : new BadRequestException();
   }
 
-  // guard function to check if the staff is assigned to a ticket
+  // guard function => to check if the staff is assigned to a ticket || in comment service
   async isStaffAssignedTicket(
     staffId: number,
     ticketId: number,
   ): Promise<boolean> {
+    console.log('staffId: ', staffId);
+    console.log('ticketId: ', ticketId);
     const ticket = await this.staffTicketRepository.findOne({
       where: {
         ticketId,
         staffId,
       },
     });
+    console.log('in isstaff a ticket fun', ticket);
     if (!ticket) return false;
     return true;
   }

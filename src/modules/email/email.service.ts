@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { sendEmail, OTPCodeGenerator } from 'src/util/';
 import { UserService } from '../user/user.service';
-import { IEmailOptions } from 'src/common/interfaces';
+import { EMAIL_REPOSITORY } from 'src/common/contants';
 
 //! instead of one function that take the options as a parameter [for all eamil cases],
 //! I made it separated , because the above approach is hard to update and not open for extensions and closed for modifaction
@@ -18,6 +18,8 @@ export class EmailService {
   constructor(
     @Inject(forwardRef(() => UserService))
     private userService: UserService,
+    @Inject(EMAIL_REPOSITORY)
+    private emailRepository,
   ) {}
 
   async send(userId: number, subject: string, text: string) {
@@ -26,11 +28,16 @@ export class EmailService {
     const to = user.email;
     await sendEmail({ subject, from: 'khaleda.02f@gmail.com', to, text });
 
-    //TODO: add the new eamil into the table
+    await this.emailRepository.create({
+      userId: user.id,
+      subject,
+      message: text,
+    });
     this.logger.log(`Email Sent to ${to}`);
   }
 
-  // user verification , statff creation
+  //? done
+  // user verification & confirmation, statff creation
   async sendOtp(userId: number, otp: number) {
     await this.send(
       userId,
@@ -38,20 +45,20 @@ export class EmailService {
       `Hey ,your code ${otp} , valid in an hour `,
     );
   }
-
-  async newTicketEmail(userId: number, title: string) {
+  //? done
+  async newTicketEmail(userId: number, ticketTitle: string) {
     await this.send(
       userId,
       'New Ticket Created',
-      `Hey , we just want you to know that you have created a new ticket , with titile ${title} `,
+      `Hey , we just want you to know that you have created a new ticket , with titile ${ticketTitle} `,
     );
   }
 
-  async ticketUpdated(userId: number, title: string) {
+  async ticketUpdated(userId: number, ticketTitle: string) {
     await this.send(
       userId,
       'Your Ticket Has Updated ',
-      `Hey , we just want you to know that tickets '${title}' has updated `,
+      `Hey , we just want you to know that tickets '${ticketTitle}' has updated `,
     );
   }
 
