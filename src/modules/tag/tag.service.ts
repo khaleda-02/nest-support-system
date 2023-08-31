@@ -36,6 +36,8 @@ export class TagService {
 
   async tagATicket(tagId: number, ticketId: number, userId: number) {
     await this.ticketService.findOne(ticketId, userId);
+    const tag = await this.tagRepository.findOne({ where: { id: tagId } });
+    if (!tag) throw new BadRequestException(`Could not find this tag `);
     return await this.ticketTagRepository.create({ tagId, ticketId });
   }
 }

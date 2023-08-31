@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Put,
   Param,
   Delete,
   UseInterceptors,
@@ -15,10 +14,10 @@ import { TransactionInterceptor } from 'src/common/interceptors/transaction.inte
 import { Transaction } from 'sequelize';
 import { TransactionDecorator } from 'src/common/decorators/transaction.decorator';
 import { UserTicketService } from '../services';
-import { UpdateTicketDto } from 'src/common/dtos/update-ticket.dto';
 import { CreateFeedbackDto } from '../dto/create-feedback.dto';
 import { Role } from 'src/common/enums';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @UseInterceptors(TransactionInterceptor)
 @Roles(Role.USER)
@@ -35,6 +34,7 @@ export class TicketController {
     return this.ticketService.create(createTicketDto, user.id, transaction);
   }
 
+  @UseInterceptors(CacheInterceptor)
   @Get()
   findAll(@UserIdentity() user) {
     return this.ticketService.findAll(user.id);
@@ -43,16 +43,6 @@ export class TicketController {
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number, @UserIdentity() user) {
     return this.ticketService.findOne(id, user.id);
-  }
-
-  @Put(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateTicketDto: UpdateTicketDto,
-    @UserIdentity() user,
-    @TransactionDecorator() transaction: Transaction,
-  ) {
-    return this.ticketService.update(id, updateTicketDto, user.id, transaction);
   }
 
   @Delete(':id')

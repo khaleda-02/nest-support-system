@@ -56,13 +56,10 @@ export class AdminService {
   }
 
   //! staff serciess
-  async accept(userId: number, otp: string, transaction: Transaction) {
-    await this.userService.verifyAndUpdateUser(
-      userId,
-      otp,
-      { roles: Role.STAFF },
-      transaction,
-    );
+  async accept(userId: number, otp: string) {
+    await this.userService.verifyAndUpdateUser(userId, otp, {
+      roles: Role.STAFF,
+    });
   }
 
   //! admin services

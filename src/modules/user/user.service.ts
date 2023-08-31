@@ -16,6 +16,7 @@ import { OTPCodeGenerator } from 'src/util';
 import { UpdateUserDto } from './dto/update-user-info.dto';
 import { Role, UserStatus } from 'src/common/enums';
 import { Transaction } from 'sequelize';
+import { Op } from 'sequelize';
 interface IUserInfo {
   roles?: Role;
   status?: UserStatus;
@@ -23,7 +24,6 @@ interface IUserInfo {
 
 @Injectable()
 export class UserService {
-  private readonly logger = new Logger(UserService.name);
   constructor(
     @Inject(USER_REPOSITORY)
     private userRepository,
@@ -34,7 +34,12 @@ export class UserService {
   //! Base Methods
   async create(createUserDto: CreateUserDto): Promise<User> {
     const user = await this.userRepository.findOne({
-      where: { username: createUserDto.username },
+      where: {
+        [Op.or]: [
+          { email: createUserDto.email },
+          { username: createUserDto.username },
+        ],
+      },
     });
     if (user) throw new BadRequestException('User already exists');
 
@@ -68,18 +73,13 @@ export class UserService {
   }
 
   // func => change the user's status and rolse .
-  async verifyAndUpdateUser(
-    id: number,
-    otp: string,
-    data: IUserInfo,
-    transaction: Transaction,
-  ) {
+  async verifyAndUpdateUser(id: number, otp: string, data: IUserInfo) {
     const user = await this.userRepository.findOne({ where: { id } });
-    if (!user) throw new NotFoundException('user not found');
+    if (!user) throw new NotFoundException('user not found ');
     const isVerified = await compare(otp, user.otp);
     if (!isVerified || user.otpExpiry < Date.now())
       throw new BadRequestException('otp not valid');
-    await user.update({ ...data }, { transaction });
+    await user.update({ ...data });
     return user;
   }
 

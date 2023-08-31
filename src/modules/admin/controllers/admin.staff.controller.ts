@@ -2,11 +2,18 @@ import { Controller, Delete, Get, Param, ParseIntPipe } from '@nestjs/common';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/enums';
 import { AdminService } from '../services/admin.service';
+import { UserIdentity } from 'src/common/decorators/user.decorator';
 
 @Roles(Role.ADMIN)
 @Controller('admins/staffs')
 export class AdminStaffController {
   constructor(private adminService: AdminService) {}
+
+  @Get('')
+  findAll(@UserIdentity() user) {
+    return this.adminService.findAll(user);
+  }
+
   @Get(':userId')
   invite(@Param('userId', ParseIntPipe) userId: number) {
     return this.adminService.invite(userId);

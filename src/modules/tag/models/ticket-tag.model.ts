@@ -40,7 +40,7 @@ const exculededDates = [
 @Table({
   underscored: true,
   paranoid: true,
-  tableName: 'TicketTags',
+  tableName: 'TicketsTags',
   defaultScope: {
     attributes: {
       exclude: [...exculededDates],

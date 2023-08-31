@@ -8,8 +8,6 @@ import { UserService } from 'src/modules/user/user.service';
 config();
 
 export class AuthGuard implements CanActivate {
-  private logger = new Logger(AuthGuard.name);
-
   constructor(
     private reflector: Reflector,
     private jwtService: JwtService,
@@ -34,6 +32,7 @@ export class AuthGuard implements CanActivate {
       //finding the user , and didn't store teh user in the token
       // to get the lastest user info (because maybe the user's info got updated)
       const { password, ...user } = await this.userService.findOne(username);
+      // if (!user || user.status != UserStatus.active) return false;
       if (!user) return false;
       request['user'] = user;
       return true;

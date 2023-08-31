@@ -41,7 +41,7 @@ export class EmailService {
   async sendOtp(userId: number, otp: number) {
     await this.send(
       userId,
-      'Staff Invitation',
+      'One Time Password',
       `Hey ,your code ${otp} , valid in an hour `,
     );
   }

@@ -5,6 +5,7 @@ import { UserService } from '../user/user.service';
 import { hash, compare } from 'bcrypt';
 import { CreateUserDto } from 'src/common/dtos/create-user.dto';
 import { EmailService } from '../email/email.service';
+import { UserStatus } from 'src/common/enums';
 
 @Injectable()
 export class AuthService {
@@ -33,5 +34,10 @@ export class AuthService {
       createUserDto,
     );
     return user;
+  }
+  async verifyUser(userId: number, otp: string) {
+    return await this.userService.verifyAndUpdateUser(userId, otp, {
+      status: UserStatus.ACTIVE,
+    });
   }
 }

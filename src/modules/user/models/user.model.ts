@@ -15,7 +15,7 @@ import { StaffsTicket } from 'src/modules/admin/models/staff-ticket.model';
 import { Comment } from 'src/modules/ticket/models/comment.model';
 import { Email } from 'src/modules/email/models/email.model';
 
-const { DATE, NUMBER, STRING, BOOLEAN } = DataType;
+const { DATE, NUMBER, STRING } = DataType;
 const exculededDates = [
   'createdAt',
   'updatedAt',

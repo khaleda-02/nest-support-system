@@ -18,18 +18,17 @@ import { UpdateTicketDto } from 'src/common/dtos/update-ticket.dto';
 import { TransactionDecorator } from 'src/common/decorators/transaction.decorator';
 import { Transaction } from 'sequelize';
 import { ScheduleTicketDto } from 'src/common/dtos/schedule-ticket.dto';
+import { VerifyUserDto } from 'src/common/dtos/verify-user.dto';
 
 @Roles(Role.STAFF)
 @UseInterceptors(TransactionInterceptor)
 @Controller('staffs/')
 export class StaffController {
   constructor(private adminService: AdminService) {}
-
-  @Get('')
+  @Get('tickets')
   findAll(@UserIdentity() user) {
     return this.adminService.findAll(user);
   }
-
   @Get('tickets/:ticketId')
   findOne(
     @Param('ticketId', ParseIntPipe) ticketId: number,
@@ -71,13 +70,9 @@ export class StaffController {
     //todo eamil staff after 1 days
   }
 
-  @Post(':userId')
-  accept(
-    @Param('userId', ParseIntPipe) userId: number,
-    @UserIdentity() user,
-    @Body('otp') otp: string,
-    @TransactionDecorator() transaction: Transaction,
-  ) {
-    return this.adminService.accept(userId, otp, transaction);
+  @Roles(Role.USER)
+  @Post('accept')
+  accept(@UserIdentity() user, @Body() { otp }: VerifyUserDto) {
+    return this.adminService.accept(user.id, otp);
   }
 }

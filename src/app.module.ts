@@ -13,7 +13,10 @@ import { TagModule } from './modules/tag/tag.module';
 
 @Module({
   imports: [
-    CacheModule.register(),
+    CacheModule.register({
+      ttl: 300000,
+      isGlobal: true,
+    }),
     ConfigModule.forRoot({ isGlobal: true, load: config }),
     DatabaseModule,
     AuthModule,

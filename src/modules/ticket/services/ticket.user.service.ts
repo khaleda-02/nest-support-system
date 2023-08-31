@@ -56,26 +56,6 @@ export class UserTicketService {
     return ticket;
   }
 
-  async update(
-    id: number,
-    updateTicketDto: UpdateTicketDto,
-    userId: number,
-    transaction: Transaction,
-  ) {
-    const ticket = await this.ticketRepository.findOne({
-      where: { id, userId },
-    });
-
-    if (!ticket) throw new NotFoundException('ticket not found');
-
-    const updatedTicket = await ticket.update(
-      { ...updateTicketDto, updatedAt: new Date(), updatedBy: userId },
-      { transaction },
-    );
-    this.emailService.ticketUpdated(updatedTicket.userId, updatedTicket.title);
-    return updatedTicket;
-  }
-
   async remove(id: number, userId: number, transaction: Transaction) {
     const ticket = await this.ticketRepository.findOne({
       where: { id, userId },

@@ -3,12 +3,14 @@ import { TICKET_REPOSITORY } from 'src/common/contants';
 import { FindOptions, Transaction } from 'sequelize';
 import { UpdateTicketDto } from 'src/common/dtos/update-ticket.dto';
 import { ScheduleTicketDto } from 'src/common/dtos/schedule-ticket.dto';
+import { EmailService } from 'src/modules/email/email.service';
 
 @Injectable()
 export class AdminTicketService {
   constructor(
     @Inject(TICKET_REPOSITORY)
     private ticketRepository,
+    private emailService: EmailService,
   ) {}
 
   async findAll() {
@@ -35,9 +37,11 @@ export class AdminTicketService {
 
     if (!ticket) throw new NotFoundException('ticket not found');
 
-    return await ticket.update(
+    const updatedTicket = await ticket.update(
       { ...ticketDto, updatedAt: new Date(), updatedBy: userId },
       { transaction },
     );
+    this.emailService.ticketUpdated(updatedTicket.userId, updatedTicket.title);
+    return updatedTicket;
   }
 }

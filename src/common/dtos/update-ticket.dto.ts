@@ -17,7 +17,7 @@ export class UpdateTicketDto {
   @IsNotEmpty()
   @IsEnum(Priority)
   priority: Priority;
-  
+
   @IsOptional()
   @IsDateString()
   @MinDate(new Date())
