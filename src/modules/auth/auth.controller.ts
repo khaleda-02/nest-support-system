@@ -5,6 +5,7 @@ import { Public } from '../../common/decorators/access.decorator';
 import { CreateUserDto } from 'src/common/dtos/create-user.dto';
 import { UserIdentity } from 'src/common/decorators/user.decorator';
 import { VerifyUserDto } from '../../common/dtos/verify-user.dto';
+import { IUser } from 'src/common/interfaces';
 
 @Controller('auth')
 export class AuthController {
@@ -23,7 +24,7 @@ export class AuthController {
   }
 
   @Post('verify')
-  async verifyUser(@Body() { otp }: VerifyUserDto, @UserIdentity() user) {
+  async verifyUser(@Body() { otp }: VerifyUserDto, @UserIdentity() user: IUser) {
     return await this.authService.verifyUser(user.id, otp);
   }
 }

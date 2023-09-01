@@ -11,12 +11,13 @@ import { UpdateTicketDto } from 'src/common/dtos/update-ticket.dto';
 import { CreateFeedbackDto } from '../dto/create-feedback.dto';
 import { Status } from 'src/common/enums';
 import { EmailService } from 'src/modules/email/email.service';
+import { Ticket } from '../models/ticket.model';
 
 @Injectable()
 export class UserTicketService {
   constructor(
     @Inject(TICKET_REPOSITORY)
-    private ticketRepository,
+    private ticketRepository: typeof Ticket,
     private emailService: EmailService,
   ) {}
 
@@ -63,7 +64,7 @@ export class UserTicketService {
 
     if (!ticket) throw new BadRequestException(`Couldn not find a ticket`);
 
-    ticket.deletedBy = userId;
+    ticket.deletedBy = `${userId}`;
     return await ticket.destroy({ transaction });
   }
 

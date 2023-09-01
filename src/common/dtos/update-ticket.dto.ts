@@ -5,6 +5,7 @@ import {
   IsOptional,
   MinDate,
 } from 'class-validator';
+import moment from 'moment';
 import { Priority, Status } from 'src/common/enums';
 
 export class UpdateTicketDto {
@@ -18,8 +19,8 @@ export class UpdateTicketDto {
   @IsEnum(Priority)
   priority: Priority;
 
-  @IsOptional()
-  @IsDateString()
-  @MinDate(new Date())
-  date: Date;
+  // @IsOptional()
+  // @IsDateString()
+  // @MinDate(moment().utc().toDate())
+  // date: Date;
 }

@@ -15,6 +15,7 @@ import { Role } from 'src/common/enums';
 import { UserIdentity } from 'src/common/decorators/user.decorator';
 import { TransactionDecorator } from 'src/common/decorators/transaction.decorator';
 import { Transaction } from 'sequelize';
+import { IUser } from 'src/common/interfaces';
 
 @Roles(Role.USER)
 @Controller('tags')
@@ -24,7 +25,7 @@ export class TagController {
   @Post()
   create(
     @Body() createTagDto: CreateTagDto,
-    @UserIdentity() user,
+    @UserIdentity() user: IUser,
     @TransactionDecorator() transaction: Transaction,
   ) {
     return this.tagService.create(createTagDto, user.id, transaction);
@@ -33,7 +34,7 @@ export class TagController {
   @Get('ticket/:ticketId')
   findAllTicketTags(
     @Param('ticketId', ParseIntPipe) ticketId: number,
-    @UserIdentity() user,
+    @UserIdentity() user: IUser,
   ) {
     return this.tagService.findAllTicketTags(ticketId, user.id);
   }
@@ -42,7 +43,7 @@ export class TagController {
   tagATicket(
     @Param('tagId', ParseIntPipe) tagId: number,
     @Param('ticketId', ParseIntPipe) ticketId: number,
-    @UserIdentity() user,
+    @UserIdentity() user: IUser,
   ) {
     return this.tagService.tagATicket(tagId, ticketId, user.id);
   }

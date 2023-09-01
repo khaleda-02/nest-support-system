@@ -3,6 +3,7 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/enums';
 import { AdminService } from '../services/admin.service';
 import { UserIdentity } from 'src/common/decorators/user.decorator';
+import { IUser } from 'src/common/interfaces';
 
 @Roles(Role.ADMIN)
 @Controller('admins/staffs')
@@ -10,7 +11,7 @@ export class AdminStaffController {
   constructor(private adminService: AdminService) {}
 
   @Get('')
-  findAll(@UserIdentity() user) {
+  findAll(@UserIdentity() user: IUser) {
     return this.adminService.findAll(user);
   }
 

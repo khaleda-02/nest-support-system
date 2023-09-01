@@ -1,10 +1,11 @@
 import { Type } from 'class-transformer';
 import { IsDate, IsDateString, MinDate } from 'class-validator';
+import moment from 'moment';
 
 export class ScheduleTicketDto {
   @Type(() => Date)
   @IsDate()
-  @MinDate(new Date())
+  @MinDate(() => moment().add(1, 'hour').toDate())
   scheduledDate: Date;
 }
 

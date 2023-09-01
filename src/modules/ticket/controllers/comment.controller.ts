@@ -13,6 +13,7 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/enums';
 import { UserIdentity } from 'src/common/decorators/user.decorator';
 import { CacheInterceptor } from '@nestjs/cache-manager';
+import { IUser } from 'src/common/interfaces';
 
 @Roles(Role.STAFF, Role.USER)
 @Controller('comments/tickets')
@@ -23,7 +24,7 @@ export class CommentController {
   create(
     @Body() createCommentDto: CreateCommentDto,
     @Param('ticketId', ParseIntPipe) ticketId: number,
-    @UserIdentity() user,
+    @UserIdentity() user: IUser,
   ) {
     return this.commentService.create(createCommentDto, user.id, ticketId);
   }
@@ -32,7 +33,7 @@ export class CommentController {
   @Get(':ticketId')
   findAll(
     @Param('ticketId', ParseIntPipe) ticketId: number,
-    @UserIdentity() user,
+    @UserIdentity() user: IUser,
   ) {
     return this.commentService.findAll(ticketId, user.id);
   }

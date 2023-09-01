@@ -1,5 +1,6 @@
 'use strict';
 
+// add user_id
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Emails', {
@@ -12,6 +13,10 @@ module.exports = {
       user_id: {
         allowNull: false,
         type: Sequelize.INTEGER,
+        references: {
+          model: 'Users',
+          key: 'id',
+        },
       },
       message: {
         allowNull: false,

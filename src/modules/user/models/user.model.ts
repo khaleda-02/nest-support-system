@@ -63,7 +63,7 @@ export class User extends Model<User> {
   lastname: string;
 
   @Column(NUMBER)
-  phoneNumber: number;
+  phoneNumber: string;
 
   @Column(STRING)
   password: string;

@@ -1,4 +1,9 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { Transaction } from 'sequelize';
 import { STAFF_TICKET__REPOSITORY } from 'src/common/contants';
 import { ScheduleTicketDto } from 'src/common/dtos/schedule-ticket.dto';
@@ -8,18 +13,20 @@ import { EmailService } from 'src/modules/email/email.service';
 import { AdminTicketService } from 'src/modules/ticket/services';
 import { User } from 'src/modules/user/models/user.model';
 import { UserService } from 'src/modules/user/user.service';
+import { StaffsTicket } from '../models/staff-ticket.model';
+import { IUser } from 'src/common/interfaces';
 
 @Injectable()
 export class AdminService {
   constructor(
     @Inject(STAFF_TICKET__REPOSITORY)
-    private staffTicketRepository,
+    private staffTicketRepository: typeof StaffsTicket,
     private ticketService: AdminTicketService,
     private userService: UserService,
     private emailService: EmailService,
   ) {}
 
-  async findAll(user: User) {
+  async findAll(user: IUser): Promise<StaffsTicket[]> {
     if (user.roles.includes(Role.STAFF)) {
       return await this.staffTicketRepository.scope('withTicket').findAll({
         where: { staffId: user.id },
@@ -28,7 +35,7 @@ export class AdminService {
     return await this.ticketService.findAll();
   }
 
-  async findOne(ticketId: number, user: User) {
+  async findOne(ticketId: number, user: IUser): Promise<StaffsTicket> {
     if (user.roles.includes(Role.STAFF)) {
       return await this.staffTicketRepository.scope('withTicket').findOne({
         where: { staffId: user.id, ticketId },
@@ -41,9 +48,9 @@ export class AdminService {
   async update(
     ticketId: number,
     ticketDto: UpdateTicketDto | ScheduleTicketDto,
-    user: User,
+    user: IUser,
     transactions: Transaction,
-  ) {
+  ): Promise<string | HttpException> {
     const updatedTicket = await this.ticketService.update(
       ticketId,
       ticketDto,
@@ -56,10 +63,15 @@ export class AdminService {
   }
 
   //! staff serciess
-  async accept(userId: number, otp: string) {
-    await this.userService.verifyAndUpdateUser(userId, otp, {
-      roles: Role.STAFF,
-    });
+  async accept(userId: number, otp: string): Promise<string | HttpException> {
+    const newStaff: IUser = await this.userService.verifyAndUpdateUser(
+      userId,
+      otp,
+      { roles: Role.STAFF },
+    );
+    return newStaff
+      ? `accepted staff ${newStaff.username}`
+      : new BadRequestException();
   }
 
   //! admin services
@@ -77,9 +89,6 @@ export class AdminService {
   }
 
   async assign(staffId: number, ticketId: number) {
-    // ماش المفروض اني
-    // it's suppord that when I try to add a non exists staff here, gives me an error , bevause of the forign key
-    // TODO askhatem is this checking if the user role => staff & checking from the ticket if exists good practice
     const user = await this.userService.findOneById(staffId);
     if (!user || !user.roles.includes(Role.STAFF))
       throw new BadRequestException(`staff not found`);

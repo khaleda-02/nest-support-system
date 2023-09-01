@@ -4,6 +4,8 @@ import { FindOptions, Transaction } from 'sequelize';
 import { UpdateTicketDto } from 'src/common/dtos/update-ticket.dto';
 import { ScheduleTicketDto } from 'src/common/dtos/schedule-ticket.dto';
 import { EmailService } from 'src/modules/email/email.service';
+import moment from 'moment';
+import { Ticket } from '../models/ticket.model';
 
 @Injectable()
 export class AdminTicketService {
@@ -38,7 +40,7 @@ export class AdminTicketService {
     if (!ticket) throw new NotFoundException('ticket not found');
 
     const updatedTicket = await ticket.update(
-      { ...ticketDto, updatedAt: new Date(), updatedBy: userId },
+      { ...ticketDto, updatedAt: moment().utc().toDate(), updatedBy: userId },
       { transaction },
     );
     this.emailService.ticketUpdated(updatedTicket.userId, updatedTicket.title);

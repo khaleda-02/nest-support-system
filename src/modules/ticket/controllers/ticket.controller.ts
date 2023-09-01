@@ -18,6 +18,7 @@ import { CreateFeedbackDto } from '../dto/create-feedback.dto';
 import { Role } from 'src/common/enums';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { CacheInterceptor } from '@nestjs/cache-manager';
+import { IUser } from 'src/common/interfaces';
 
 @UseInterceptors(TransactionInterceptor)
 @Roles(Role.USER)
@@ -28,7 +29,7 @@ export class TicketController {
   @Post()
   create(
     @Body() createTicketDto: CreateTicketDto,
-    @UserIdentity() user,
+    @UserIdentity() user: IUser,
     @TransactionDecorator() transaction: Transaction,
   ) {
     return this.ticketService.create(createTicketDto, user.id, transaction);
@@ -36,19 +37,19 @@ export class TicketController {
 
   @UseInterceptors(CacheInterceptor)
   @Get()
-  findAll(@UserIdentity() user) {
+  findAll(@UserIdentity() user: IUser) {
     return this.ticketService.findAll(user.id);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number, @UserIdentity() user) {
+  findOne(@Param('id', ParseIntPipe) id: number, @UserIdentity() user: IUser) {
     return this.ticketService.findOne(id, user.id);
   }
 
   @Delete(':id')
   remove(
     @Param('id', ParseIntPipe) id: number,
-    @UserIdentity() user,
+    @UserIdentity() user: IUser,
     @TransactionDecorator() transaction: Transaction,
   ) {
     return this.ticketService.remove(id, user.id, transaction);
@@ -58,7 +59,7 @@ export class TicketController {
   feedback(
     @Param('id', ParseIntPipe) id: number,
     @Body() createFeedbackDto: CreateFeedbackDto,
-    @UserIdentity() user,
+    @UserIdentity() user: IUser,
     @TransactionDecorator() transaction: Transaction,
   ) {
     return this.ticketService.feedback(

@@ -12,10 +12,18 @@ module.exports = {
       ticket_id: {
         allowNull: false,
         type: Sequelize.INTEGER,
+        references: {
+          model: 'Tickets',
+          key: 'id',
+        },
       },
       tag_id: {
         allowNull: false,
         type: Sequelize.INTEGER,
+        references: {
+          model: 'Tags',
+          key: 'id',
+        },
       },
       created_at: {
         allowNull: false,

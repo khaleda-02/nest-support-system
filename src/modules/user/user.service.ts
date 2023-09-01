@@ -2,9 +2,7 @@ import {
   BadRequestException,
   Inject,
   Injectable,
-  Logger,
   NotFoundException,
-  UnauthorizedException,
   forwardRef,
 } from '@nestjs/common';
 import { User } from './models/user.model';
@@ -13,10 +11,10 @@ import { CreateUserDto } from 'src/common/dtos/create-user.dto';
 import { EmailService } from '../email/email.service';
 import { hash, compare } from 'bcrypt';
 import { OTPCodeGenerator } from 'src/util';
-import { UpdateUserDto } from './dto/update-user-info.dto';
 import { Role, UserStatus } from 'src/common/enums';
-import { Transaction } from 'sequelize';
 import { Op } from 'sequelize';
+import { IUser } from 'src/common/interfaces';
+import moment from 'moment';
 interface IUserInfo {
   roles?: Role;
   status?: UserStatus;
@@ -26,7 +24,7 @@ interface IUserInfo {
 export class UserService {
   constructor(
     @Inject(USER_REPOSITORY)
-    private userRepository,
+    private userRepository: typeof User,
     @Inject(forwardRef(() => EmailService))
     private emailService: EmailService,
   ) {}
@@ -44,12 +42,12 @@ export class UserService {
     if (user) throw new BadRequestException('User already exists');
 
     const otp = OTPCodeGenerator();
-    const hashedOtp = await hash(`${otp}`, 10);
+    const hashedOtp: string = await hash(`${otp}`, 10);
     createUserDto.password = await hash(createUserDto.password, 10);
     const newUser = await this.userRepository.create({
       ...createUserDto,
       otp: hashedOtp,
-      otpExpiry: Date.now() + 3600000,
+      otpExpiry: moment().utc().add(1, 'hour').toDate(),
     });
 
     await this.emailService.sendOtp(newUser.id, otp);
@@ -73,11 +71,15 @@ export class UserService {
   }
 
   // func => change the user's status and rolse .
-  async verifyAndUpdateUser(id: number, otp: string, data: IUserInfo) {
+  async verifyAndUpdateUser(
+    id: number,
+    otp: string,
+    data: IUserInfo,
+  ): Promise<IUser> {
     const user = await this.userRepository.findOne({ where: { id } });
     if (!user) throw new NotFoundException('user not found ');
     const isVerified = await compare(otp, user.otp);
-    if (!isVerified || user.otpExpiry < Date.now())
+    if (!isVerified || user.otpExpiry < moment().utc().add(1, 'hour').toDate())
       throw new BadRequestException('otp not valid');
     await user.update({ ...data });
     return user;
@@ -91,7 +93,7 @@ export class UserService {
     const hashedOtp = await hash(`${otp}`, 10);
     await user.update({
       otp: hashedOtp,
-      otpExpiry: Date.now() + 3600000,
+      otpExpiry: moment().utc().toDate(),
     });
     await this.emailService.sendOtp(user.id, otp);
 

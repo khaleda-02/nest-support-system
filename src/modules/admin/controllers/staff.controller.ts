@@ -19,6 +19,7 @@ import { TransactionDecorator } from 'src/common/decorators/transaction.decorato
 import { Transaction } from 'sequelize';
 import { ScheduleTicketDto } from 'src/common/dtos/schedule-ticket.dto';
 import { VerifyUserDto } from 'src/common/dtos/verify-user.dto';
+import { IUser } from 'src/common/interfaces';
 
 @Roles(Role.STAFF)
 @UseInterceptors(TransactionInterceptor)
@@ -26,13 +27,13 @@ import { VerifyUserDto } from 'src/common/dtos/verify-user.dto';
 export class StaffController {
   constructor(private adminService: AdminService) {}
   @Get('tickets')
-  findAll(@UserIdentity() user) {
+  findAll(@UserIdentity() user: IUser) {
     return this.adminService.findAll(user);
   }
   @Get('tickets/:ticketId')
   findOne(
     @Param('ticketId', ParseIntPipe) ticketId: number,
-    @UserIdentity() user,
+    @UserIdentity() user: IUser,
   ) {
     return this.adminService.findOne(ticketId, user);
   }
@@ -42,7 +43,7 @@ export class StaffController {
   update(
     @Param('ticketId', ParseIntPipe) ticketId: number,
     @Body() updateTicketDto: UpdateTicketDto,
-    @UserIdentity() user,
+    @UserIdentity() user: IUser,
     @TransactionDecorator() transaction: Transaction,
   ) {
     return this.adminService.update(
@@ -58,7 +59,7 @@ export class StaffController {
   schedule(
     @Param('ticketId', ParseIntPipe) ticketId: number,
     @Body() scheduleTicketDto: ScheduleTicketDto,
-    @UserIdentity() user,
+    @UserIdentity() user: IUser,
     @TransactionDecorator() transaction: Transaction,
   ) {
     return this.adminService.update(

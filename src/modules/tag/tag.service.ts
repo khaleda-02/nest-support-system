@@ -3,14 +3,16 @@ import { CreateTagDto } from './dto/create-tag.dto';
 import { TAG_REPOSITORY, TICKET_TAG_REPOSITORY } from 'src/common/contants';
 import { Transaction } from 'sequelize';
 import { UserTicketService } from 'src/modules/ticket/services/ticket.user.service';
+import { TicketTag } from './models/ticket-tag.model';
+import { Tag } from './models/tag.model';
 
 @Injectable()
 export class TagService {
   constructor(
     @Inject(TICKET_TAG_REPOSITORY)
-    private ticketTagRepository,
+    private ticketTagRepository: typeof TicketTag,
     @Inject(TAG_REPOSITORY)
-    private tagRepository,
+    private tagRepository: typeof Tag,
     private ticketService: UserTicketService,
   ) {}
 

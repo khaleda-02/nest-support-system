@@ -16,6 +16,7 @@ import { TransactionDecorator } from 'src/common/decorators/transaction.decorato
 import { Transaction } from 'sequelize';
 import { UpdateTicketDto } from 'src/common/dtos/update-ticket.dto';
 import { AdminService } from '../services/admin.service';
+import { IUser } from 'src/common/interfaces';
 
 @Roles(Role.ADMIN)
 @UseInterceptors(TransactionInterceptor)
@@ -24,14 +25,14 @@ export class AdminTicketController {
   constructor(private adminService: AdminService) {}
 
   @Get()
-  findAll(@UserIdentity() user) {
+  findAll(@UserIdentity() user: IUser) {
     return this.adminService.findAll(user);
   }
 
   @Get(':ticketId')
   findOne(
     @Param('ticketId', ParseIntPipe) ticketId: number,
-    @UserIdentity() user,
+    @UserIdentity() user: IUser,
   ) {
     return this.adminService.findOne(ticketId, user);
   }
@@ -40,7 +41,7 @@ export class AdminTicketController {
   update(
     @Param('ticketId', ParseIntPipe) ticketId: number,
     @Body() updateTicketDto: UpdateTicketDto,
-    @UserIdentity() user,
+    @UserIdentity() user: IUser,
     @TransactionDecorator() transaction: Transaction,
   ) {
     return this.adminService.update(

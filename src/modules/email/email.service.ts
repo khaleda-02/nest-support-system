@@ -8,6 +8,7 @@ import {
 import { sendEmail, OTPCodeGenerator } from 'src/util/';
 import { UserService } from '../user/user.service';
 import { EMAIL_REPOSITORY } from 'src/common/contants';
+import { Email } from './models/email.model';
 
 //! instead of one function that take the options as a parameter [for all eamil cases],
 //! I made it separated , because the above approach is hard to update and not open for extensions and closed for modifaction
@@ -19,7 +20,7 @@ export class EmailService {
     @Inject(forwardRef(() => UserService))
     private userService: UserService,
     @Inject(EMAIL_REPOSITORY)
-    private emailRepository,
+    private emailRepository: typeof Email,
   ) {}
 
   async send(userId: number, subject: string, text: string) {

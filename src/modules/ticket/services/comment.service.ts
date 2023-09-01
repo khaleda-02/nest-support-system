@@ -4,12 +4,13 @@ import { COMMENT_REPOSITORY } from 'src/common/contants';
 import { EmailService } from 'src/modules/email/email.service';
 import { UserTicketService } from './ticket.user.service';
 import { AdminService } from 'src/modules/admin/services/admin.service';
+import { Comment } from '../models/comment.model';
 
 @Injectable()
 export class CommentService {
   constructor(
     @Inject(COMMENT_REPOSITORY)
-    private commentRepository,
+    private commentRepository: typeof Comment,
     private emailService: EmailService,
     private ticketService: UserTicketService,
     private adminService: AdminService,
