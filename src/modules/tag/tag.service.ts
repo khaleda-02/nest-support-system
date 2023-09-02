@@ -20,7 +20,7 @@ export class TagService {
     { name }: CreateTagDto,
     userId: number,
     transaction: Transaction,
-  ) {
+  ): Promise<Tag> {
     const tag = await this.tagRepository.findOne({
       where: { name, userId },
     });
@@ -28,7 +28,10 @@ export class TagService {
     return await this.tagRepository.create({ name, userId }, { transaction });
   }
 
-  async findAllTicketTags(ticketId: number, userId: number) {
+  async findAllTicketTags(
+    ticketId: number,
+    userId: number,
+  ): Promise<TicketTag[]> {
     await this.ticketService.findOne(ticketId, userId);
     const tickets = await this.ticketTagRepository.scope('withTag').findAll({
       where: { ticketId },
@@ -36,7 +39,11 @@ export class TagService {
     return tickets;
   }
 
-  async tagATicket(tagId: number, ticketId: number, userId: number) {
+  async tagATicket(
+    tagId: number,
+    ticketId: number,
+    userId: number,
+  ): Promise<TicketTag> {
     await this.ticketService.findOne(ticketId, userId);
     const tag = await this.tagRepository.findOne({ where: { id: tagId } });
     if (!tag) throw new BadRequestException(`Could not find this tag `);

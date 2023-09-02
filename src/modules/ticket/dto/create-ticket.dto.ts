@@ -4,7 +4,7 @@ import { Priority } from 'src/common/enums';
 export class CreateTicketDto {
   @IsNotEmpty()
   @IsEnum(Priority)
-  priority: string;
+  priority: Priority;
 
   @IsNotEmpty()
   title: string;

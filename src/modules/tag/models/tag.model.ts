@@ -1,7 +1,6 @@
 import {
   AutoIncrement,
   BelongsTo,
-  BelongsToMany,
   Column,
   DataType,
   ForeignKey,
@@ -26,7 +25,6 @@ export class Tag extends Model<Tag> {
   @Column(STRING)
   name: string;
 
-  //! User association
   @BelongsTo(() => User)
   user: User;
 
@@ -34,11 +32,9 @@ export class Tag extends Model<Tag> {
   @Column(NUMBER)
   userId: number;
 
-  //! TicketsTags association
   @HasMany(() => TicketTag)
   TicketTags: TicketTag[];
-  // @BelongsToMany(() => Ticket, () => TicketTag)
-  // tickets: Ticket[];
+
 
   @Column(DATE)
   createdAt: Date;

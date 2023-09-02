@@ -35,7 +35,7 @@ export class TicketController {
     return this.ticketService.create(createTicketDto, user.id, transaction);
   }
 
-  @UseInterceptors(CacheInterceptor)
+  // @UseInterceptors(CacheInterceptor)
   @Get()
   findAll(@UserIdentity() user: IUser) {
     return this.ticketService.findAll(user.id);

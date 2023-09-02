@@ -14,7 +14,8 @@ import { OTPCodeGenerator } from 'src/util';
 import { Role, UserStatus } from 'src/common/enums';
 import { Op } from 'sequelize';
 import { IUser } from 'src/common/interfaces';
-import moment from 'moment';
+import * as moment from 'moment';
+
 interface IUserInfo {
   roles?: Role;
   status?: UserStatus;
@@ -44,10 +45,12 @@ export class UserService {
     const otp = OTPCodeGenerator();
     const hashedOtp: string = await hash(`${otp}`, 10);
     createUserDto.password = await hash(createUserDto.password, 10);
+    const otpExpiry = moment().utc().add(1, 'hour').toDate();
+
     const newUser = await this.userRepository.create({
       ...createUserDto,
       otp: hashedOtp,
-      otpExpiry: moment().utc().add(1, 'hour').toDate(),
+      otpExpiry,
     });
 
     await this.emailService.sendOtp(newUser.id, otp);
@@ -79,7 +82,7 @@ export class UserService {
     const user = await this.userRepository.findOne({ where: { id } });
     if (!user) throw new NotFoundException('user not found ');
     const isVerified = await compare(otp, user.otp);
-    if (!isVerified || user.otpExpiry < moment().utc().add(1, 'hour').toDate())
+    if (!isVerified || user.otpExpiry < moment().utc().toDate())
       throw new BadRequestException('otp not valid');
     await user.update({ ...data });
     return user;
@@ -91,9 +94,10 @@ export class UserService {
     if (!user) throw new NotFoundException('user not found');
     const otp = OTPCodeGenerator();
     const hashedOtp = await hash(`${otp}`, 10);
+    const otpExpiry = moment().utc().add(1, 'hour').toDate();
     await user.update({
       otp: hashedOtp,
-      otpExpiry: moment().utc().toDate(),
+      otpExpiry,
     });
     await this.emailService.sendOtp(user.id, otp);
 

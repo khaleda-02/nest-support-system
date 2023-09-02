@@ -21,7 +21,6 @@ export class CommentService {
     userId: number,
     ticketId: number,
   ) {
-    //TODO askhatem  check if the staff assigned to this ticket , and  the user own the ticket
     const ticket = await this.isValid(userId, ticketId);
     const comment = await this.commentRepository.create({
       ...createCommentDto,

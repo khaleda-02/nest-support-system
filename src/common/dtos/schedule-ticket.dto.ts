@@ -1,6 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsDate, IsDateString, MinDate } from 'class-validator';
-import moment from 'moment';
+import * as moment from 'moment';
+
 
 export class ScheduleTicketDto {
   @Type(() => Date)

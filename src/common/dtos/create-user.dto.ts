@@ -22,14 +22,15 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @IsString()
-  @Length(10)
+  @Length(6, 12)
   password: string;
-  
+
   @IsNotEmpty()
   @IsEmail()
   email: string;
-  
+
   @IsNotEmpty()
   @IsString()
+  @Length(10)
   phoneNumber: string;
 }

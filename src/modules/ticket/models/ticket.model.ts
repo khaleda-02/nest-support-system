@@ -36,7 +36,7 @@ export class Ticket extends Model<Ticket> {
       Status.CLOSED,
     ),
   )
-  status: string;
+  status: Status;
 
   @Column(STRING)
   title: string;
@@ -48,7 +48,7 @@ export class Ticket extends Model<Ticket> {
   scheduledDate: Date;
 
   @Column(ENUM(Priority.LOW, Priority.MEDIUM, Priority.HIGH, Priority.CRITICAL))
-  priority: string;
+  priority: Priority;
 
   @Column(STRING)
   feedback: string;
@@ -69,8 +69,6 @@ export class Ticket extends Model<Ticket> {
   //! TicketsTags association
   @HasMany(() => TicketTag)
   TicketTags: TicketTag[];
-  // @BelongsToMany(() => Tag, () => TicketTag)
-  // tags: Tag[];
 
   //! StaffTicket association
   @HasMany(() => StaffsTicket)

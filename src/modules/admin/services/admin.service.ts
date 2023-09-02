@@ -4,17 +4,19 @@ import {
   Inject,
   Injectable,
 } from '@nestjs/common';
-import { Transaction } from 'sequelize';
+import { Transaction, WhereOptions } from 'sequelize';
 import { STAFF_TICKET__REPOSITORY } from 'src/common/contants';
 import { ScheduleTicketDto } from 'src/common/dtos/schedule-ticket.dto';
 import { UpdateTicketDto } from 'src/common/dtos/update-ticket.dto';
 import { Role } from 'src/common/enums';
 import { EmailService } from 'src/modules/email/email.service';
 import { AdminTicketService } from 'src/modules/ticket/services';
-import { User } from 'src/modules/user/models/user.model';
 import { UserService } from 'src/modules/user/user.service';
 import { StaffsTicket } from '../models/staff-ticket.model';
 import { IUser } from 'src/common/interfaces';
+import { Ticket } from 'src/modules/ticket/models/ticket.model';
+import { Op } from 'sequelize';
+import { Status } from 'src/common/enums';
 
 @Injectable()
 export class AdminService {
@@ -26,7 +28,7 @@ export class AdminService {
     private emailService: EmailService,
   ) {}
 
-  async findAll(user: IUser): Promise<StaffsTicket[]> {
+  async findAll(user: IUser): Promise<Ticket[] | StaffsTicket[]> {
     if (user.roles.includes(Role.STAFF)) {
       return await this.staffTicketRepository.scope('withTicket').findAll({
         where: { staffId: user.id },
@@ -35,7 +37,7 @@ export class AdminService {
     return await this.ticketService.findAll();
   }
 
-  async findOne(ticketId: number, user: IUser): Promise<StaffsTicket> {
+  async findOne(ticketId: number, user: IUser): Promise<Ticket | StaffsTicket> {
     if (user.roles.includes(Role.STAFF)) {
       return await this.staffTicketRepository.scope('withTicket').findOne({
         where: { staffId: user.id, ticketId },
@@ -62,7 +64,6 @@ export class AdminService {
       : new BadRequestException();
   }
 
-  //! staff serciess
   async accept(userId: number, otp: string): Promise<string | HttpException> {
     const newStaff: IUser = await this.userService.verifyAndUpdateUser(
       userId,
@@ -79,18 +80,39 @@ export class AdminService {
     await this.userService.createAndSendOtp(userId);
   }
 
-  //Todo: askhatem ,what's should happen if the staff assigns to a ticket ,
-  // and how can I chage the status of each ticket was assigned to that staff . maybe a map
-  async remove(userId: number) {
-    // find
-    // this.userService.findOneById(userId);
-    // destory
-    // TODO change the user role => staff to user , and  re open the
+  async remove(staffId: number, transaction: Transaction) {
+    const staff = await this.userService.findOneById(staffId);
+    if (staff.roles != Role.STAFF)
+      throw new BadRequestException('staff not found');
+
+    // change the status of those tickets (non closed , non reserved) to open
+    const staffTickets = await this.staffTicketRepository.findAll({
+      where: { staffId },
+      transaction,
+    });
+    const ticketIds = staffTickets.map(
+      (entry) => entry.get({ plain: true }).ticketId,
+    );
+    const whereOptions: WhereOptions = {
+      id: { [Op.in]: ticketIds },
+      status: { [Op.notIn]: ['closed', 'reserved'] },
+    };
+    await this.ticketService.reOpenTickets(whereOptions, transaction);
+
+    // remove all records from StaffsTickets that assigned to this staff
+    await this.staffTicketRepository.destroy({
+      where: { staffId },
+      transaction,
+    });
+
+    // change the user role => staff to user
+    staff.roles = Role.USER;
+    return await staff.save({ transaction });
   }
 
-  async assign(staffId: number, ticketId: number) {
+  async assign(staffId: number, ticketId: number, transaction: Transaction) {
     const user = await this.userService.findOneById(staffId);
-    if (!user || !user.roles.includes(Role.STAFF))
+    if (!user || user.roles != Role.STAFF)
       throw new BadRequestException(`staff not found`);
 
     await this.ticketService.findOne(ticketId);
@@ -107,12 +129,16 @@ export class AdminService {
       staffId,
       ticketId,
     });
+    const ticketDto: UpdateTicketDto = {
+      status: Status.ASSIGNED,
+    };
+    await this.ticketService.update(ticketId, ticketDto, staffId, transaction);
     await this.emailService.AssignTicket(user.id);
     return staffTicket;
     // todo : corn job , email the staff after 2 daysschedule
   }
 
-  async unAssign(staffId: number, ticketId: number) {
+  async unAssign(staffId: number, ticketId: number, transaction: Transaction) {
     const isAssigned = await this.staffTicketRepository.findOne({
       where: {
         ticketId,
@@ -128,7 +154,10 @@ export class AdminService {
         staffId,
       },
     });
-
+    const ticketDto: UpdateTicketDto = {
+      status: Status.OPEN,
+    };
+    await this.ticketService.update(ticketId, ticketDto, staffId, transaction);
     return staffTicket
       ? `staff ${staffId} unassigned successfully`
       : new BadRequestException();

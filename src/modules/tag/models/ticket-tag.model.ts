@@ -47,7 +47,7 @@ const exculededDates = [
     },
   },
 })
-export class TicketTag extends Model<Tag> {
+export class TicketTag extends Model<TicketTag> {
   @PrimaryKey
   @AutoIncrement
   @Column(NUMBER)
