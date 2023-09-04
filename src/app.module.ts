@@ -10,6 +10,7 @@ import { AdminModule } from './modules/admin/admin.module';
 import { EmailModule } from './modules/email/email.module';
 import { TestController } from './test.controller';
 import { TagModule } from './modules/tag/tag.module';
+import { RealTimeModule } from './modules/real-time/real-time.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { TagModule } from './modules/tag/tag.module';
     AdminModule,
     EmailModule,
     TagModule,
+    RealTimeModule,
   ],
   controllers: [TestController],
 })

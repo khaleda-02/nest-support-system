@@ -28,10 +28,15 @@ export class AdminService {
     private emailService: EmailService,
   ) {}
 
-  async findAll(user: IUser): Promise<Ticket[] | StaffsTicket[]> {
-    if (user.roles.includes(Role.STAFF)) {
+  async findAll(
+    user: IUser,
+    whereOptions: WhereOptions,
+    paginationOptions,
+  ): Promise<Ticket[] | StaffsTicket[]> {
+    if (user.roles == Role.STAFF) {
       return await this.staffTicketRepository.scope('withTicket').findAll({
-        where: { staffId: user.id },
+        where: { staffId: user.id, ...whereOptions },
+        ...paginationOptions,
       });
     }
     return await this.ticketService.findAll();
@@ -90,6 +95,7 @@ export class AdminService {
       where: { staffId },
       transaction,
     });
+    // getting the assigned tickets for this staff
     const ticketIds = staffTickets.map(
       (entry) => entry.get({ plain: true }).ticketId,
     );
@@ -132,7 +138,9 @@ export class AdminService {
     const ticketDto: UpdateTicketDto = {
       status: Status.ASSIGNED,
     };
+    // update ticket status
     await this.ticketService.update(ticketId, ticketDto, staffId, transaction);
+    // email the user about the update
     await this.emailService.AssignTicket(user.id);
     return staffTicket;
     // todo : corn job , email the staff after 2 daysschedule

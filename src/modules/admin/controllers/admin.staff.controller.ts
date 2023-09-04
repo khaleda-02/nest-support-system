@@ -21,11 +21,6 @@ import { Transaction } from 'sequelize';
 export class AdminStaffController {
   constructor(private adminService: AdminService) {}
 
-  @Get('')
-  findAll(@UserIdentity() user: IUser) {
-    return this.adminService.findAll(user);
-  }
-
   @Get(':userId')
   invite(@Param('userId', ParseIntPipe) userId: number) {
     return this.adminService.invite(userId);

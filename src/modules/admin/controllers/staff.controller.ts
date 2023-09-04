@@ -6,6 +6,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UseInterceptors,
 } from '@nestjs/common';
 import { Roles } from 'src/common/decorators/roles.decorator';
@@ -16,10 +17,12 @@ import { AdminService } from '../services/admin.service';
 import { UserIdentity } from 'src/common/decorators/user.decorator';
 import { UpdateTicketDto } from 'src/common/dtos/update-ticket.dto';
 import { TransactionDecorator } from 'src/common/decorators/transaction.decorator';
-import { Transaction } from 'sequelize';
+import { Transaction, WhereOptions } from 'sequelize';
 import { ScheduleTicketDto } from 'src/common/dtos/schedule-ticket.dto';
 import { VerifyUserDto } from 'src/common/dtos/verify-user.dto';
 import { IUser } from 'src/common/interfaces';
+import { FilterDto } from 'src/common/dtos/search-filter.dto';
+import { Op } from 'sequelize';
 
 @Roles(Role.STAFF)
 @UseInterceptors(TransactionInterceptor)
@@ -27,8 +30,10 @@ import { IUser } from 'src/common/interfaces';
 export class StaffController {
   constructor(private adminService: AdminService) {}
   @Get('tickets')
-  findAll(@UserIdentity() user: IUser) {
-    return this.adminService.findAll(user);
+  findAll(@UserIdentity() user: IUser, @Query() filterDto: FilterDto) {
+    const whereOptions = this.buildWhereOptions(filterDto);
+    const paginationOptions = this.buildPaginationOptions(filterDto);
+    return this.adminService.findAll(user, whereOptions, paginationOptions);
   }
   @Get('tickets/:ticketId')
   findOne(
@@ -75,5 +80,34 @@ export class StaffController {
   @Post('accept')
   accept(@UserIdentity() user, @Body() { otp }: VerifyUserDto) {
     return this.adminService.accept(user.id, otp);
+  }
+
+  //? heloper methodes :
+  buildWhereOptions(filters: FilterDto) {
+    const { status, startDate, endDate } = filters;
+    const whereOptions: WhereOptions = {};
+    if (status) {
+      whereOptions.status = status;
+    }
+    if (startDate && endDate) {
+      whereOptions.createdAt = {
+        [Op.between]: [startDate, endDate],
+      };
+    }
+
+    return whereOptions;
+  }
+
+  buildPaginationOptions(filters: FilterDto) {
+    const page = filters.page || 1;
+    const pageSize = filters.pageSize || 10;
+
+    const offset = (page - 1) * pageSize;
+    const limit = pageSize;
+
+    return {
+      offset,
+      limit,
+    };
   }
 }
