@@ -63,12 +63,19 @@ export class EmailService {
     );
   }
 
-  async AssignTicket(userId: number) {
+  async assignTicket(userId: number) {
     await this.send(
       userId,
       'New Ticket Assignment',
       `Hey ,our admins assigned a new ticket to you , 
       pelase check your assigned tickets `,
+    );
+  }
+  async delayTicket(userId: number, ticketTitle: string) {
+    await this.send(
+      userId,
+      'please do what you assigned to ',
+      `Hey ,our admins ask you to resolce your assinged tickets , your delayed ticket ${ticketTitle}`,
     );
   }
 }

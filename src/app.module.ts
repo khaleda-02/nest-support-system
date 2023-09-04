@@ -11,6 +11,7 @@ import { EmailModule } from './modules/email/email.module';
 import { TestController } from './test.controller';
 import { TagModule } from './modules/tag/tag.module';
 import { RealTimeModule } from './modules/real-time/real-time.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { RealTimeModule } from './modules/real-time/real-time.module';
       isGlobal: true,
     }),
     ConfigModule.forRoot({ isGlobal: true, load: config }),
+    ScheduleModule.forRoot(),
     DatabaseModule,
     AuthModule,
     UserModule,

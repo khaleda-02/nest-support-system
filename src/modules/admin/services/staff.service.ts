@@ -20,6 +20,8 @@ import { Status } from 'src/common/enums';
 import { Gateway } from 'src/modules/real-time/real-time.gateway';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import * as moment from 'moment';
 
 @Injectable()
 export class StaffService {
@@ -105,10 +107,16 @@ export class StaffService {
     return true;
   }
 
-  // Delay Ticekts without changing the status : 1- after 1 day of scheduling be staff . 2- after 2 days of assignment
-  // every midnight :
-  // got all dely tickets (scheduled $or assignment)
-  // loop it and send a email to the assigned staff .
-  // 12 : 00 , 4-8  , find all ticket with scheduled date with 
-
+  //! Scheduled Tasks
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async delayedTickets() {
+    const delayedTickets = await this.ticketService.findDelayedTicket();
+    for (const ticket of delayedTickets) {
+      const ticketTitle = ticket.title;
+      await this.emailService.delayTicket(
+        ticket.staffsTicket[0].staffId,
+        ticketTitle,
+      );
+    }
+  }
 }

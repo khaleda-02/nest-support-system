@@ -19,6 +19,7 @@ import { Status } from 'src/common/enums';
 import { Gateway } from 'src/modules/real-time/real-time.gateway';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import * as moment from 'moment';
 @Injectable()
 export class AdminService {
   constructor(
@@ -127,7 +128,7 @@ export class AdminService {
     await this.ticketService.update(ticketId, ticketDto, staffId, transaction);
     // email the user about the update
     this.gateway.notifyUser(user.id, `you assigned to ticket `);
-    await this.emailService.AssignTicket(user.id);
+    await this.emailService.assignTicket(user.id);
     await this.cacheManager.del('staffTickets');
 
     return staffTicket;

@@ -10,6 +10,8 @@ import { Status } from 'src/common/enums';
 import { Gateway } from 'src/modules/real-time/real-time.gateway';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { StaffsTicket } from 'src/modules/admin/models/staff-ticket.model';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class AdminTicketService {
@@ -53,7 +55,7 @@ export class AdminTicketService {
       },
       { transaction },
     );
-    await this.cacheManager.reset(); // to prevent user , admin , staff to access the old data 
+    await this.cacheManager.reset(); // to prevent user , admin , staff to access the old data
     this.gateway.notifyUser(
       updatedTicket.userId,
       `your ticket ${updatedTicket.title} has updated`,
@@ -72,5 +74,27 @@ export class AdminTicketService {
       },
     );
     return updatedTickets;
+  }
+
+  async findDelayedTicket() {
+    return await this.ticketRepository.findAll({
+      where: {
+        [Op.or]: [
+          {
+            scheduledDate: {
+              [Op.lte]: moment().utc().subtract('1', 'days').toDate(),
+            },
+            status: Status.SCHEDULED,
+          },
+          {
+            updatedAt: {
+              [Op.lte]: moment().utc().subtract('2', 'days').toDate(),
+            },
+            status: Status.ASSIGNED,
+          },
+        ],
+      },
+      include: { model: StaffsTicket },
+    });
   }
 }
