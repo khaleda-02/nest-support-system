@@ -5,6 +5,7 @@ import { EmailService } from 'src/modules/email/email.service';
 import { UserTicketService } from './ticket.user.service';
 import { AdminService } from 'src/modules/admin/services/admin.service';
 import { Comment } from '../models/comment.model';
+import { Gateway } from 'src/modules/real-time/real-time.gateway';
 
 @Injectable()
 export class CommentService {
@@ -14,6 +15,7 @@ export class CommentService {
     private emailService: EmailService,
     private ticketService: UserTicketService,
     private adminService: AdminService,
+    private gateway: Gateway,
   ) {}
 
   async create(
@@ -21,12 +23,16 @@ export class CommentService {
     userId: number,
     ticketId: number,
   ) {
-    const ticket = await this.isValid(userId, ticketId);
+    const ticket = await this.isValid(userId, ticketId); // isValid witll throw exception in case of invalid ticket
     const comment = await this.commentRepository.create({
       ...createCommentDto,
       ticketId,
       userId,
     });
+    this.gateway.notifyUser(
+      ticket.userId,
+      `new coomment added on ticket ${ticket.title} `,
+    );
     await this.emailService.ticketUpdated(ticket.userId, ticket.title);
     return comment;
   }

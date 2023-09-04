@@ -7,6 +7,7 @@ import { EmailService } from 'src/modules/email/email.service';
 import * as moment from 'moment';
 import { Ticket } from '../models/ticket.model';
 import { Status } from 'src/common/enums';
+import { Gateway } from 'src/modules/real-time/real-time.gateway';
 
 @Injectable()
 export class AdminTicketService {
@@ -14,6 +15,7 @@ export class AdminTicketService {
     @Inject(TICKET_REPOSITORY)
     private ticketRepository: typeof Ticket,
     private emailService: EmailService,
+    private gateway: Gateway,
   ) {}
 
   async findAll(): Promise<Ticket[]> {
@@ -48,11 +50,15 @@ export class AdminTicketService {
       },
       { transaction },
     );
+    this.gateway.notifyUser(
+      updatedTicket.userId,
+      `your ticket ${updatedTicket.title} has updated`,
+    );
     this.emailService.ticketUpdated(updatedTicket.userId, updatedTicket.title);
     return updatedTicket;
   }
 
-  // single used function for re-open ticekts that was assigned to staff [used in adminService]
+  // single used function for re-open ticekts that was assigned to deleted staff [used in adminService]
   async reOpenTickets(options: WhereOptions, transaction: Transaction) {
     const updatedTickets = await this.ticketRepository.update(
       { status: Status.OPEN },

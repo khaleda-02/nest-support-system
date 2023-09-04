@@ -4,7 +4,6 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Console } from 'console';
 import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({
@@ -12,11 +11,9 @@ import { Server, Socket } from 'socket.io';
     origin: '*',
   },
 })
-//! instead of creating a new room for each ticket , I Created a map to sotore ticket ID maps to a set of connections
-// to reduce the number of rooms .
 export class Gateway {
   private logger = new Logger(Gateway.name);
-  private ticketSocketMap: Map<string, Socket> = new Map();
+  private ticketSocketMap: Map<number, Socket> = new Map();
 
   @WebSocketServer()
   server: Server;
@@ -27,33 +24,20 @@ export class Gateway {
     });
   }
 
-  // When a user logs in or connects, store their socket ID
   @SubscribeMessage('user-connected')
-  handleUserConnected(socket: Socket, payload: { userId: string }) {
-    console.log(`User connected`, socket.id);
+  handleUserConnected(socket: Socket, payload: { userId: number }) {
     this.ticketSocketMap.set(payload.userId, socket);
-    // socket.join(payload.userId);
   }
 
-  // When a user logs out or disconnects, remove their socket ID
   @SubscribeMessage('user-disconnected')
-  handleUserDisconnected(payload: { userId: string }) {
+  handleUserDisconnected(payload: { userId: number }) {
     this.ticketSocketMap.delete(payload.userId);
   }
 
-  handleMessage(userId: string) {
-    console.log(userId);
+  notifyUser(userId: number, message: string) {
     const socket = this.ticketSocketMap.get(userId);
-    console.log(socket);
-
     if (socket) {
-      this.server.to(socket.id).emit('got-updates', 'data');
+      this.server.to(socket.id).emit('got-updates', message);
     }
-    // console.log(this.ticketSocketMap);
-    // console.log(socket);
-    //   socket.emit('got-updates', {
-    //     message: 'message',
-    //     time: new Date().toDateString(),
-    //   });
   }
 }

@@ -12,7 +12,7 @@ export class TestController {
   constructor(
     private adminService: AdminService,
     private gateway: Gateway,
-    private readonly webSocketGateway: Gateway,
+    private webSocketGateway: Gateway,
   ) {}
 
   @UseInterceptors(TransactionInterceptor)
@@ -20,7 +20,7 @@ export class TestController {
   @Get('/')
   test(@TransactionDecorator() transaction: Transaction) {
     // return this.adminService.remove(3, transaction);
-    return this.gateway.handleMessage('8');
+    // return this.gateway.handleMessage('8');
     // this.webSocketGateway.server
     //   .to(`ticket-${2}`)
     //   .emit('newComment', 'test test');

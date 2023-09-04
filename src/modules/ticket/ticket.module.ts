@@ -8,9 +8,10 @@ import {
 } from './services';
 import { EmailModule } from '../email/email.module';
 import { AdminModule } from '../admin/admin.module';
+import { RealTimeModule } from '../real-time/real-time.module';
 
 @Module({
-  imports: [EmailModule, forwardRef(() => AdminModule)],
+  imports: [forwardRef(() => AdminModule), EmailModule, RealTimeModule],
   controllers: [TicketController, CommentController],
   providers: [
     ...ticketProviders,

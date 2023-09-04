@@ -17,6 +17,7 @@ import { IUser } from 'src/common/interfaces';
 import { Ticket } from 'src/modules/ticket/models/ticket.model';
 import { Op } from 'sequelize';
 import { Status } from 'src/common/enums';
+import { Gateway } from 'src/modules/real-time/real-time.gateway';
 
 @Injectable()
 export class AdminService {
@@ -26,6 +27,7 @@ export class AdminService {
     private ticketService: AdminTicketService,
     private userService: UserService,
     private emailService: EmailService,
+    private gateway: Gateway,
   ) {}
 
   async findAll(
@@ -141,6 +143,7 @@ export class AdminService {
     // update ticket status
     await this.ticketService.update(ticketId, ticketDto, staffId, transaction);
     // email the user about the update
+    this.gateway.notifyUser(user.id, `you assigned to ticket `);
     await this.emailService.AssignTicket(user.id);
     return staffTicket;
     // todo : corn job , email the staff after 2 daysschedule
