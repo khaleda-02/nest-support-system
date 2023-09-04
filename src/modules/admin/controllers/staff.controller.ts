@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Inject,
   Param,
   ParseIntPipe,
   Post,
@@ -13,7 +14,7 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { AssignedStaff } from 'src/common/decorators/staff-ticket.decorator';
 import { Role } from 'src/common/enums';
 import { TransactionInterceptor } from 'src/common/interceptors/transaction.interceptor';
-import { AdminService } from '../services/admin.service';
+import { StaffService } from '../services/staff.service';
 import { UserIdentity } from 'src/common/decorators/user.decorator';
 import { UpdateTicketDto } from 'src/common/dtos/update-ticket.dto';
 import { TransactionDecorator } from 'src/common/decorators/transaction.decorator';
@@ -28,19 +29,21 @@ import { Op } from 'sequelize';
 @UseInterceptors(TransactionInterceptor)
 @Controller('staffs/')
 export class StaffController {
-  constructor(private adminService: AdminService) {}
+  constructor(private staffService: StaffService) {}
+
   @Get('tickets')
   findAll(@UserIdentity() user: IUser, @Query() filterDto: FilterDto) {
     const whereOptions = this.buildWhereOptions(filterDto);
     const paginationOptions = this.buildPaginationOptions(filterDto);
-    return this.adminService.findAll(user, whereOptions, paginationOptions);
+    return this.staffService.findAll(user, whereOptions, paginationOptions);
   }
+
   @Get('tickets/:ticketId')
   findOne(
     @Param('ticketId', ParseIntPipe) ticketId: number,
     @UserIdentity() user: IUser,
   ) {
-    return this.adminService.findOne(ticketId, user);
+    return this.staffService.findOne(ticketId, user);
   }
 
   @AssignedStaff() // decorator for enable gaurd for checking if the user assigned to a ticket
@@ -51,7 +54,7 @@ export class StaffController {
     @UserIdentity() user: IUser,
     @TransactionDecorator() transaction: Transaction,
   ) {
-    return this.adminService.update(
+    return this.staffService.update(
       ticketId,
       updateTicketDto,
       user,
@@ -67,7 +70,7 @@ export class StaffController {
     @UserIdentity() user: IUser,
     @TransactionDecorator() transaction: Transaction,
   ) {
-    return this.adminService.update(
+    return this.staffService.update(
       ticketId,
       scheduleTicketDto,
       user,
@@ -79,7 +82,7 @@ export class StaffController {
   @Roles(Role.USER)
   @Post('accept')
   accept(@UserIdentity() user, @Body() { otp }: VerifyUserDto) {
-    return this.adminService.accept(user.id, otp);
+    return this.staffService.accept(user.id, otp);
   }
 
   //? heloper methodes :

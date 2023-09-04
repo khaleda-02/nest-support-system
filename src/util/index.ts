@@ -1,12 +1,11 @@
 import { createTransport } from 'nodemailer';
 import { IEmailOptions } from '../common/interfaces';
-//TODO store user & pass into .env
 
 const transport = createTransport({
   service: 'Gmail',
   auth: {
-    user: 'khaleda.02f@gmail.com',
-    pass: 'kizzzwntxcfrniaz',
+    user: process.env.USER,
+    pass: process.env.PASS,
   },
 });
 

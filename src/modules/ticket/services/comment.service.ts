@@ -3,7 +3,7 @@ import { CreateCommentDto } from '../dto/create-comment.dto';
 import { COMMENT_REPOSITORY } from 'src/common/contants';
 import { EmailService } from 'src/modules/email/email.service';
 import { UserTicketService } from './ticket.user.service';
-import { AdminService } from 'src/modules/admin/services/admin.service';
+import { StaffService } from 'src/modules/admin/services/staff.service';
 import { Comment } from '../models/comment.model';
 import { Gateway } from 'src/modules/real-time/real-time.gateway';
 
@@ -14,7 +14,7 @@ export class CommentService {
     private commentRepository: typeof Comment,
     private emailService: EmailService,
     private ticketService: UserTicketService,
-    private adminService: AdminService,
+    private staffService: StaffService,
     private gateway: Gateway,
   ) {}
 
@@ -45,7 +45,7 @@ export class CommentService {
   }
 
   async isValid(userId: number, ticketId: number) {
-    const isAssigned = await this.adminService.isStaffAssignedTicket(
+    const isAssigned = await this.staffService.isStaffAssignedTicket(
       userId,
       ticketId,
     );

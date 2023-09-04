@@ -1,10 +1,16 @@
 import { Type } from 'class-transformer';
-import { IsDate, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsDate,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+} from 'class-validator';
+import { Status } from '../enums';
 
 export class FilterDto {
   @IsOptional()
-  @IsString()
-  status?: string;
+  @IsEnum(Status)
+  status?: Status;
 
   @IsOptional()
   @Type(() => Date)

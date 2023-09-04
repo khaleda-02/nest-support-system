@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
   UseInterceptors,
   Query,
+  Inject,
 } from '@nestjs/common';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/enums';
@@ -29,9 +30,7 @@ export class AdminTicketController {
 
   @Get()
   findAll(@UserIdentity() user: IUser, @Query() filterDto: FilterDto) {
-    const whereOptions = this.buildWhereOptions(filterDto);
-    const paginationOptions = this.buildPaginationOptions(filterDto);
-    return this.adminService.findAll(user, whereOptions, paginationOptions);
+    return this.adminService.findAll(user);
   }
 
   @Get(':ticketId')
@@ -55,34 +54,5 @@ export class AdminTicketController {
       user,
       transaction,
     );
-  }
-
-  //? heloper methodes :
-  buildWhereOptions(filters: FilterDto) {
-    const { status, startDate, endDate } = filters;
-    const whereOptions: WhereOptions = {};
-    if (status) {
-      whereOptions.status = status;
-    }
-    if (startDate && endDate) {
-      whereOptions.createdAt = {
-        [Op.between]: [startDate, endDate],
-      };
-    }
-
-    return whereOptions;
-  }
-
-  buildPaginationOptions(filters: FilterDto) {
-    const page = filters.page || 1;
-    const pageSize = filters.pageSize || 10;
-
-    const offset = (page - 1) * pageSize;
-    const limit = pageSize;
-
-    return {
-      offset,
-      limit,
-    };
   }
 }

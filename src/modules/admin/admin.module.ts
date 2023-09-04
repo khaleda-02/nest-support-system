@@ -10,6 +10,7 @@ import { AdminService } from './services/admin.service';
 import { UserModule } from '../user/user.module';
 import { EmailModule } from '../email/email.module';
 import { RealTimeModule } from '../real-time/real-time.module';
+import { StaffService } from './services/staff.service';
 @Module({
   imports: [
     forwardRef(() => TicketModule),
@@ -18,7 +19,7 @@ import { RealTimeModule } from '../real-time/real-time.module';
     RealTimeModule,
   ],
   controllers: [AdminTicketController, AdminStaffController, StaffController],
-  providers: [AdminService, ...amdinProviders],
-  exports: [AdminService],
+  providers: [AdminService, StaffService, ...amdinProviders],
+  exports: [AdminService, StaffService],
 })
 export class AdminModule {}

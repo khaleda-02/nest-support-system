@@ -7,11 +7,12 @@ import {
 import { CreateTicketDto } from '../dto/create-ticket.dto';
 import { TICKET_REPOSITORY } from 'src/common/contants';
 import { Transaction } from 'sequelize';
-import { UpdateTicketDto } from 'src/common/dtos/update-ticket.dto';
 import { CreateFeedbackDto } from '../dto/create-feedback.dto';
 import { Status } from 'src/common/enums';
 import { EmailService } from 'src/modules/email/email.service';
 import { Ticket } from '../models/ticket.model';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class UserTicketService {
@@ -19,6 +20,7 @@ export class UserTicketService {
     @Inject(TICKET_REPOSITORY)
     private ticketRepository: typeof Ticket,
     private emailService: EmailService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async create(
@@ -34,11 +36,18 @@ export class UserTicketService {
       { transaction },
     );
     await this.emailService.newTicketEmail(userId, ticket.title);
+    await this.cacheManager.del('userTickets');
+    await this.cacheManager.del('adminTickets');
     return ticket;
   }
 
   async findAll(userId: number) {
-    return await this.ticketRepository.findAll({ where: { userId } });
+    const cacheTickets = await this.cacheManager.get('userTickets');
+    if (cacheTickets) return cacheTickets;
+
+    const tickets = await this.ticketRepository.findAll({ where: { userId } });
+    await this.cacheManager.set('userTickets', tickets);
+    return tickets;
   }
 
   async findOne(id: number, userId: number) {
@@ -65,6 +74,7 @@ export class UserTicketService {
     if (!ticket) throw new BadRequestException(`Couldn not find a ticket`);
 
     ticket.deletedBy = `${userId}`;
+    await this.cacheManager.del('userTickets');
     return await ticket.destroy({ transaction });
   }
 
@@ -83,7 +93,7 @@ export class UserTicketService {
       throw new BadRequestException(
         "can't give a feedbace for not closed tickets",
       );
-
+    await this.cacheManager.del('userTickets');
     return await ticket.update({ ...createFeedbackDto }, { transaction });
   }
 }

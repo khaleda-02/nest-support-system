@@ -8,6 +8,8 @@ import * as moment from 'moment';
 import { Ticket } from '../models/ticket.model';
 import { Status } from 'src/common/enums';
 import { Gateway } from 'src/modules/real-time/real-time.gateway';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class AdminTicketService {
@@ -16,6 +18,7 @@ export class AdminTicketService {
     private ticketRepository: typeof Ticket,
     private emailService: EmailService,
     private gateway: Gateway,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async findAll(): Promise<Ticket[]> {
@@ -50,6 +53,7 @@ export class AdminTicketService {
       },
       { transaction },
     );
+    await this.cacheManager.reset(); // to prevent user , admin , staff to access the old data 
     this.gateway.notifyUser(
       updatedTicket.userId,
       `your ticket ${updatedTicket.title} has updated`,

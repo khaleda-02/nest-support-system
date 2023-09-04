@@ -18,7 +18,8 @@ import { Ticket } from 'src/modules/ticket/models/ticket.model';
 import { Op } from 'sequelize';
 import { Status } from 'src/common/enums';
 import { Gateway } from 'src/modules/real-time/real-time.gateway';
-
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 @Injectable()
 export class AdminService {
   constructor(
@@ -28,28 +29,23 @@ export class AdminService {
     private userService: UserService,
     private emailService: EmailService,
     private gateway: Gateway,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async findAll(
     user: IUser,
-    whereOptions: WhereOptions,
-    paginationOptions,
-  ): Promise<Ticket[] | StaffsTicket[]> {
-    if (user.roles == Role.STAFF) {
-      return await this.staffTicketRepository.scope('withTicket').findAll({
-        where: { staffId: user.id, ...whereOptions },
-        ...paginationOptions,
-      });
-    }
-    return await this.ticketService.findAll();
+    whereOptions: WhereOptions = {},
+    paginationOptions = {},
+  ): Promise<Ticket[]> {
+    const cacheTickets: Ticket[] = await this.cacheManager.get('adminTickets');
+    if (cacheTickets) return cacheTickets;
+
+    const tickets = await this.ticketService.findAll();
+    await this.cacheManager.set('adminTickets', tickets);
+    return tickets;
   }
 
   async findOne(ticketId: number, user: IUser): Promise<Ticket | StaffsTicket> {
-    if (user.roles.includes(Role.STAFF)) {
-      return await this.staffTicketRepository.scope('withTicket').findOne({
-        where: { staffId: user.id, ticketId },
-      });
-    }
     return await this.ticketService.findOne(ticketId);
   }
 
@@ -71,18 +67,6 @@ export class AdminService {
       : new BadRequestException();
   }
 
-  async accept(userId: number, otp: string): Promise<string | HttpException> {
-    const newStaff: IUser = await this.userService.verifyAndUpdateUser(
-      userId,
-      otp,
-      { roles: Role.STAFF },
-    );
-    return newStaff
-      ? `accepted staff ${newStaff.username}`
-      : new BadRequestException();
-  }
-
-  //! admin services
   async invite(userId: number) {
     await this.userService.createAndSendOtp(userId);
   }
@@ -145,6 +129,8 @@ export class AdminService {
     // email the user about the update
     this.gateway.notifyUser(user.id, `you assigned to ticket `);
     await this.emailService.AssignTicket(user.id);
+    await this.cacheManager.del('staffTickets');
+
     return staffTicket;
     // todo : corn job , email the staff after 2 daysschedule
   }
@@ -169,23 +155,10 @@ export class AdminService {
       status: Status.OPEN,
     };
     await this.ticketService.update(ticketId, ticketDto, staffId, transaction);
+    await this.cacheManager.del('staffTickets');
+
     return staffTicket
       ? `staff ${staffId} unassigned successfully`
       : new BadRequestException();
-  }
-
-  // guard function => to check if the staff is assigned to a ticket || in comment service
-  async isStaffAssignedTicket(
-    staffId: number,
-    ticketId: number,
-  ): Promise<boolean> {
-    const ticket = await this.staffTicketRepository.findOne({
-      where: {
-        ticketId,
-        staffId,
-      },
-    });
-    if (!ticket) return false;
-    return true;
   }
 }

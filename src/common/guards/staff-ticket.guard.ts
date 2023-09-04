@@ -3,13 +3,13 @@ import { Reflector } from '@nestjs/core';
 import { IS_STAFF_ASSIGN_TECKET_KEY } from '../contants';
 import { config } from 'dotenv';
 import { Role } from '../enums';
-import { AdminService } from 'src/modules/admin/services/admin.service';
+import { StaffService } from 'src/modules/admin/services/staff.service';
 export class AssignedStaffGuard implements CanActivate {
   private logger = new Logger(AssignedStaffGuard.name);
 
   constructor(
     private reflector: Reflector,
-    private adminService: AdminService,
+    private staffService: StaffService,
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     try {
@@ -24,7 +24,7 @@ export class AssignedStaffGuard implements CanActivate {
       const request = context.switchToHttp().getRequest();
       const user = request.user;
       if (user.roles !== Role.STAFF) return false;
-      return await this.adminService.isStaffAssignedTicket(
+      return await this.staffService.isStaffAssignedTicket(
         parseInt(request.user.id),
         parseInt(request.params.ticketId),
       );
