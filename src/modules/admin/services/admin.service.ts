@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { Transaction, WhereOptions } from 'sequelize';
 import { STAFF_TICKET__REPOSITORY } from 'src/common/contants';
-import { ScheduleTicketDto } from 'src/common/dtos/schedule-ticket.dto';
 import { UpdateTicketDto } from 'src/common/dtos/update-ticket.dto';
 import { Role } from 'src/common/enums';
 import { EmailService } from 'src/modules/email/email.service';
@@ -52,7 +51,7 @@ export class AdminService {
   // here . staff is always verified
   async update(
     ticketId: number,
-    ticketDto: UpdateTicketDto | ScheduleTicketDto,
+    ticketDto: UpdateTicketDto,
     user: IUser,
     transactions: Transaction,
   ): Promise<string | HttpException> {
@@ -132,7 +131,6 @@ export class AdminService {
     await this.cacheManager.del('staffTickets');
 
     return staffTicket;
-    // todo : corn job , email the staff after 2 daysschedule
   }
 
   async unAssign(staffId: number, ticketId: number, transaction: Transaction) {
