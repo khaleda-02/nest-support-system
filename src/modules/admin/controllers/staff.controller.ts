@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { AssignedStaff } from 'src/common/decorators/staff-ticket.decorator';
-import { Role } from 'src/common/enums';
+import { Role, Status } from 'src/common/enums';
 import { TransactionInterceptor } from 'src/common/interceptors/transaction.interceptor';
 import { StaffService } from '../services/staff.service';
 import { UserIdentity } from 'src/common/decorators/user.decorator';
@@ -72,7 +72,7 @@ export class StaffController {
   ) {
     return this.staffService.update(
       ticketId,
-      scheduleTicketDto,
+      { ...scheduleTicketDto, status: Status.SCHEDULED },
       user,
       transaction,
     );

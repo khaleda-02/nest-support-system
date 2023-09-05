@@ -5,7 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { config } from 'dotenv';
 import { UserService } from 'src/modules/user/user.service';
-import { UserStatus } from '../enums';
+import { Role, UserStatus } from '../enums';
 config();
 
 export class AuthGuard implements CanActivate {
@@ -33,7 +33,13 @@ export class AuthGuard implements CanActivate {
       //finding the user , and didn't store teh user in the token
       // to get the lastest user info (because maybe the user's info got updated)
       const { password, ...user } = await this.userService.findOne(username);
-      if (!user || user.status != UserStatus.ACTIVE) return false;
+      if (
+        !user ||
+        (user.status != UserStatus.ACTIVE &&
+          user.roles != Role.ADMIN &&
+          request.path != '/auth/verify')
+      )
+        return false;
       // if (!user) return false;
       request['user'] = user;
       return true;
@@ -47,5 +53,3 @@ export class AuthGuard implements CanActivate {
     return type == 'Bearer' ? token : undefined;
   }
 }
-
-

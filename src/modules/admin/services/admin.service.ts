@@ -62,7 +62,7 @@ export class AdminService {
       : new BadRequestException();
   }
 
-  async invite(userId: number) {
+  async invite(userId: number) {      
     await this.userService.createAndSendOtp(userId);
   }
 

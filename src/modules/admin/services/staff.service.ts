@@ -64,7 +64,7 @@ export class StaffService {
     // update fun , will notify user , email user , cleare cache [admin , staff , user]
     const updatedTicket = await this.ticketService.update(
       ticketId,
-      { ...ticketDto, status: Status.SCHEDULED },
+      ticketDto,
       user.id,
       transactions,
     );

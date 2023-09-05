@@ -6,12 +6,13 @@ import {
   IsNotEmpty,
   IsOptional,
 } from 'class-validator';
+import { ENUM } from 'sequelize';
 import { Priority, Status } from 'src/common/enums';
 
 export class UpdateTicketDto {
   @IsOptional()
   @IsNotEmpty()
-  @IsEnum(Status)
+  @IsEnum(ENUM(Status.IN_PROGRESS, Status.RESOLVED, Status.CLOSED))
   status?: Status;
 
   @IsOptional()

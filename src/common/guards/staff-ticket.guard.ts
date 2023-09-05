@@ -24,6 +24,7 @@ export class AssignedStaffGuard implements CanActivate {
       const request = context.switchToHttp().getRequest();
       const user = request.user;
       if (user.roles !== Role.STAFF) return false;
+
       return await this.staffService.isStaffAssignedTicket(
         parseInt(request.user.id),
         parseInt(request.params.ticketId),

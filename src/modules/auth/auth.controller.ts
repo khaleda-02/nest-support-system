@@ -22,7 +22,7 @@ export class AuthController {
   async register(@Body() createUserDto: CreateUserDto) {
     return await this.authService.register(createUserDto);
   }
-
+  
   @Post('verify')
   async verifyUser(@Body() { otp }: VerifyUserDto, @UserIdentity() user: IUser) {
     return await this.authService.verifyUser(user.id, otp);
