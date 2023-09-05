@@ -19,7 +19,6 @@ import { Status } from 'src/common/enums';
 import { Gateway } from 'src/modules/real-time/real-time.gateway';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
-import * as moment from 'moment';
 @Injectable()
 export class AdminService {
   constructor(
@@ -32,11 +31,7 @@ export class AdminService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  async findAll(
-    user: IUser,
-    whereOptions: WhereOptions = {},
-    paginationOptions = {},
-  ): Promise<Ticket[]> {
+  async findAll(user: IUser): Promise<Ticket[]> {
     const cacheTickets: Ticket[] = await this.cacheManager.get('adminTickets');
     if (cacheTickets) return cacheTickets;
 

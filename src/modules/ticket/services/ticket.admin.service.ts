@@ -78,7 +78,7 @@ export class AdminTicketService {
 
   async findDelayedTicket() {
     return await this.ticketRepository.findAll({
-      where: {
+      where: {   
         [Op.or]: [
           {
             scheduledDate: {

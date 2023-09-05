@@ -1,10 +1,5 @@
 import { Type } from 'class-transformer';
-import {
-  IsDate,
-  IsEnum,
-  IsNumber,
-  IsOptional,
-} from 'class-validator';
+import { IsDate, IsEnum, IsNumber, IsOptional } from 'class-validator';
 import { Status } from '../enums';
 
 export class FilterDto {
@@ -22,11 +17,9 @@ export class FilterDto {
   @IsDate()
   endDate?: Date;
 
-  @IsNumber()
   @IsOptional()
-  page: number;
+  page: string;
 
-  @IsNumber()
   @IsOptional()
-  pageSize: number;
+  pageSize: string;
 }

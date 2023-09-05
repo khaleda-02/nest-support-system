@@ -29,7 +29,7 @@ export class AdminTicketController {
   constructor(private adminService: AdminService) {}
 
   @Get()
-  findAll(@UserIdentity() user: IUser, @Query() filterDto: FilterDto) {
+  findAll(@UserIdentity() user: IUser) {
     return this.adminService.findAll(user);
   }
 

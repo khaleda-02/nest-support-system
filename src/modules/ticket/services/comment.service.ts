@@ -6,6 +6,8 @@ import { UserTicketService } from './ticket.user.service';
 import { StaffService } from 'src/modules/admin/services/staff.service';
 import { Comment } from '../models/comment.model';
 import { Gateway } from 'src/modules/real-time/real-time.gateway';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class CommentService {
@@ -16,6 +18,7 @@ export class CommentService {
     private ticketService: UserTicketService,
     private staffService: StaffService,
     private gateway: Gateway,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async create(
@@ -34,14 +37,20 @@ export class CommentService {
       `new coomment added on ticket ${ticket.title} `,
     );
     await this.emailService.ticketUpdated(ticket.userId, ticket.title);
+    await this.cacheManager.del(`${ticketId}Comments`);
     return comment;
   }
 
   async findAll(ticketId: number, userId: number) {
     await this.isValid(userId, ticketId);
-    return this.commentRepository.findAll({
+    const ticketComments: Comment[] = await this.cacheManager.get(
+      `${ticketId}Comments`,
+    );
+    if (ticketComments) return ticketComments;
+    const comments = await this.commentRepository.findAll({
       where: { ticketId },
     });
+    return comments;
   }
 
   async isValid(userId: number, ticketId: number) {

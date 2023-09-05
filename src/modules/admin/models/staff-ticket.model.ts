@@ -24,7 +24,13 @@ const exculededDates = [
 
 @Scopes(() => ({
   withTicket: {
-    include: [{ model: Ticket, attributes: { exclude: [...exculededDates] } }],
+    include: [
+      {
+        model: Ticket,
+        attributes: { exclude: [...exculededDates] },
+        where: {},
+      },
+    ],
     attributes: {
       exclude: [...exculededDates],
     },

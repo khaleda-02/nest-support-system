@@ -76,7 +76,6 @@ export class StaffController {
       user,
       transaction,
     );
-    //todo eamil staff after 1 days
   }
 
   @Roles(Role.USER)
@@ -85,7 +84,7 @@ export class StaffController {
     return this.staffService.accept(user.id, otp);
   }
 
-  //? heloper methodes :
+  //? Filtering , Pagination methodes :
   buildWhereOptions(filters: FilterDto) {
     const { status, startDate, endDate } = filters;
     const whereOptions: WhereOptions = {};
@@ -102,8 +101,8 @@ export class StaffController {
   }
 
   buildPaginationOptions(filters: FilterDto) {
-    const page = filters.page || 1;
-    const pageSize = filters.pageSize || 10;
+    const page = parseInt(filters.page) || 1;
+    const pageSize = parseInt(filters.pageSize) || 10;
 
     const offset = (page - 1) * pageSize;
     const limit = pageSize;

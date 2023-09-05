@@ -17,22 +17,19 @@ import { IUser } from 'src/common/interfaces';
 import { Ticket } from 'src/modules/ticket/models/ticket.model';
 import { Op } from 'sequelize';
 import { Status } from 'src/common/enums';
-import { Gateway } from 'src/modules/real-time/real-time.gateway';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import * as moment from 'moment';
 
 @Injectable()
 export class StaffService {
   constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @Inject(STAFF_TICKET__REPOSITORY)
     private staffTicketRepository: typeof StaffsTicket,
     private ticketService: AdminTicketService,
     private userService: UserService,
     private emailService: EmailService,
-    private gateway: Gateway,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async findAll(
@@ -40,18 +37,15 @@ export class StaffService {
     whereOptions: WhereOptions = {},
     paginationOptions = {},
   ): Promise<StaffsTicket[]> {
-    const cacheTickets: StaffsTicket[] = await this.cacheManager.get(
-      'staffTickets',
-    );
-    if (cacheTickets) return cacheTickets;
+    const tickets = await this.staffTicketRepository.findAll({
+      where: { staffId: user.id },
+      include: {
+        model: Ticket,
+        where: { ...whereOptions },
+      },
+      ...paginationOptions,
+    });
 
-    const tickets = await this.staffTicketRepository
-      .scope('withTicket')
-      .findAll({
-        where: { staffId: user.id, ...whereOptions },
-        ...paginationOptions,
-      });
-    await this.cacheManager.set('staffTickets', tickets);
     return tickets;
   }
 
@@ -61,7 +55,6 @@ export class StaffService {
     });
   }
 
-  // here . staff is always verified
   async update(
     ticketId: number,
     ticketDto: UpdateTicketDto | ScheduleTicketDto,
@@ -71,7 +64,7 @@ export class StaffService {
     // update fun , will notify user , email user , cleare cache [admin , staff , user]
     const updatedTicket = await this.ticketService.update(
       ticketId,
-      ticketDto,
+      { ...ticketDto, status: Status.SCHEDULED },
       user.id,
       transactions,
     );
@@ -110,6 +103,7 @@ export class StaffService {
   //! Scheduled Tasks
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async delayedTickets() {
+    // delayedTickets fun => will send email for all delayed tickets , and repeatedly til the staff solve the ticket .
     const delayedTickets = await this.ticketService.findDelayedTicket();
     for (const ticket of delayedTickets) {
       const ticketTitle = ticket.title;
