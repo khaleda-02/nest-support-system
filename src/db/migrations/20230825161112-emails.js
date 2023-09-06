@@ -1,6 +1,5 @@
 'use strict';
-
-// add user_id
+d
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Emails', {

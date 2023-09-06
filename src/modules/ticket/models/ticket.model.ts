@@ -10,6 +10,7 @@ import {
   ForeignKey,
   HasMany,
   BelongsToMany,
+  Scopes,
 } from 'sequelize-typescript';
 import { Priority, Status } from 'src/common/enums';
 import { StaffsTicket } from 'src/modules/admin/models/staff-ticket.model';
@@ -19,7 +20,16 @@ import { Comment } from './comment.model';
 
 const { DATE, NUMBER, STRING, BOOLEAN } = DataType;
 
-@Table({ underscored: true, paranoid: true, tableName: 'Tickets' })
+@Scopes(() => ({
+  forCommon: {
+    attributes: ['id', 'title', 'description', 'feedback', 'userId'],
+  },
+}))
+@Table({
+  underscored: true,
+  paranoid: true,
+  tableName: 'Tickets',
+})
 export class Ticket extends Model<Ticket> {
   @PrimaryKey
   @AutoIncrement

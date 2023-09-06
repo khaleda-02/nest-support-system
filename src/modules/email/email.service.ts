@@ -37,7 +37,6 @@ export class EmailService {
     this.logger.log(`Email Sent to ${to}`);
   }
 
-  //? done
   // user verification & confirmation, statff creation
   async sendOtp(userId: number, otp: number) {
     await this.send(
@@ -46,7 +45,6 @@ export class EmailService {
       `Hey ,your code ${otp} , valid in an hour `,
     );
   }
-  //? done
   async newTicketEmail(userId: number, ticketTitle: string) {
     await this.send(
       userId,

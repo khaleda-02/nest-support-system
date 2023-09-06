@@ -19,14 +19,14 @@ import { Role } from 'src/common/enums';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { IUser } from 'src/common/interfaces';
-import { Public } from 'src/common/decorators/access.decorator';
+import { Public } from '../../../common/decorators/access.decorator';
 
 @UseInterceptors(TransactionInterceptor)
-@Roles(Role.USER)
 @Controller('tickets')
 export class TicketController {
   constructor(private readonly ticketService: UserTicketService) {}
 
+  @Roles(Role.USER)
   @Post()
   create(
     @Body() createTicketDto: CreateTicketDto,
@@ -36,16 +36,25 @@ export class TicketController {
     return this.ticketService.create(createTicketDto, user.id, transaction);
   }
 
+  @Roles(Role.USER)
   @Get()
   findAll(@UserIdentity() user: IUser) {
     return this.ticketService.findAll(user.id);
   }
 
+  @Public()
+  @Get('/common')
+  findAllCommon() {
+    return this.ticketService.findCommon();
+  }
+
+  @Roles(Role.USER)
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number, @UserIdentity() user: IUser) {
     return this.ticketService.findOne(id, user.id);
   }
 
+  @Roles(Role.USER)
   @Delete(':id')
   remove(
     @Param('id', ParseIntPipe) id: number,
@@ -55,6 +64,7 @@ export class TicketController {
     return this.ticketService.remove(id, user.id, transaction);
   }
 
+  @Roles(Role.USER)
   @Post(':id/feedback')
   feedback(
     @Param('id', ParseIntPipe) id: number,
@@ -68,11 +78,5 @@ export class TicketController {
       user.id,
       transaction,
     );
-  }
-
-  @Public()
-  @Get()
-  findAllCommon() {
-    return this.ticketService.findCommon();
   }
 }

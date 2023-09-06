@@ -3,7 +3,6 @@ import { UserModule } from '../user/user.module';
 import { EmailService } from './email.service';
 import { emailProviders } from './providers/email.providers';
 
-// @Global()
 @Module({
   imports: [forwardRef(() => UserModule)],
   providers: [EmailService, ...emailProviders],

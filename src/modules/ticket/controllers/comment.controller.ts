@@ -5,14 +5,12 @@ import {
   Body,
   Param,
   ParseIntPipe,
-  UseInterceptors,
 } from '@nestjs/common';
 import { CommentService } from '../services/comment.service';
 import { CreateCommentDto } from '../dto/create-comment.dto';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/enums';
 import { UserIdentity } from 'src/common/decorators/user.decorator';
-import { CacheInterceptor } from '@nestjs/cache-manager';
 import { IUser } from 'src/common/interfaces';
 
 @Roles(Role.STAFF, Role.USER)
@@ -29,7 +27,6 @@ export class CommentController {
     return this.commentService.create(createCommentDto, user.id, ticketId);
   }
 
-  // @UseInterceptors(CacheInterceptor)
   @Get(':ticketId')
   findAll(
     @Param('ticketId', ParseIntPipe) ticketId: number,

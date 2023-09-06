@@ -103,7 +103,9 @@ export class UserTicketService {
     );
     if (cacheCommonTickets) return cacheCommonTickets;
 
-    const commonTickets = await this.ticketRepository.findAll();
+    const commonTickets = await this.ticketRepository
+      .scope('forCommon')
+      .findAll();
     await this.cacheManager.set('commonTickets ', commonTickets);
     return commonTickets;
   }
