@@ -19,6 +19,7 @@ import { Role } from 'src/common/enums';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { IUser } from 'src/common/interfaces';
+import { Public } from 'src/common/decorators/access.decorator';
 
 @UseInterceptors(TransactionInterceptor)
 @Roles(Role.USER)
@@ -35,7 +36,6 @@ export class TicketController {
     return this.ticketService.create(createTicketDto, user.id, transaction);
   }
 
-  // @UseInterceptors(CacheInterceptor)
   @Get()
   findAll(@UserIdentity() user: IUser) {
     return this.ticketService.findAll(user.id);
@@ -68,5 +68,11 @@ export class TicketController {
       user.id,
       transaction,
     );
+  }
+
+  @Public()
+  @Get()
+  findAllCommon() {
+    return this.ticketService.findCommon();
   }
 }

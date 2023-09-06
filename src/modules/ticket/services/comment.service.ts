@@ -25,7 +25,7 @@ export class CommentService {
     createCommentDto: CreateCommentDto,
     userId: number,
     ticketId: number,
-  ) {
+  ): Promise<Comment> {
     const ticket = await this.isValid(userId, ticketId); // isValid witll throw exception in case of invalid ticket
     const comment = await this.commentRepository.create({
       ...createCommentDto,
@@ -41,7 +41,7 @@ export class CommentService {
     return comment;
   }
 
-  async findAll(ticketId: number, userId: number) {
+  async findAll(ticketId: number, userId: number): Promise<Comment[]> {
     await this.isValid(userId, ticketId);
     const ticketComments: Comment[] = await this.cacheManager.get(
       `${ticketId}Comments`,

@@ -27,7 +27,7 @@ export class UserTicketService {
     createTicketDto: CreateTicketDto,
     userId: number,
     transaction: Transaction,
-  ) {
+  ): Promise<Ticket> {
     const ticket = await this.ticketRepository.create(
       {
         ...createTicketDto,
@@ -41,8 +41,8 @@ export class UserTicketService {
     return ticket;
   }
 
-  async findAll(userId: number) {
-    const cacheTickets = await this.cacheManager.get('userTickets');
+  async findAll(userId: number): Promise<Ticket[]> {
+    const cacheTickets: Ticket[] = await this.cacheManager.get('userTickets');
     if (cacheTickets) return cacheTickets;
 
     const tickets = await this.ticketRepository.findAll({ where: { userId } });
@@ -50,7 +50,7 @@ export class UserTicketService {
     return tickets;
   }
 
-  async findOne(id: number, userId: number) {
+  async findOne(id: number, userId: number): Promise<Ticket> {
     const ticket = await this.ticketRepository.findOne({
       where: { id, userId },
     });
@@ -58,7 +58,7 @@ export class UserTicketService {
     return ticket;
   }
 
-  async findOneById(id: number) {
+  async findOneById(id: number): Promise<Ticket> {
     const ticket = await this.ticketRepository.findOne({
       where: { id },
     });
@@ -95,5 +95,16 @@ export class UserTicketService {
       );
     await this.cacheManager.del('userTickets');
     return await ticket.update({ ...createFeedbackDto }, { transaction });
+  }
+
+  async findCommon(): Promise<Ticket[]> {
+    const cacheCommonTickets: Ticket[] = await this.cacheManager.get(
+      'commonTickets',
+    );
+    if (cacheCommonTickets) return cacheCommonTickets;
+
+    const commonTickets = await this.ticketRepository.findAll();
+    await this.cacheManager.set('commonTickets ', commonTickets);
+    return commonTickets;
   }
 }
