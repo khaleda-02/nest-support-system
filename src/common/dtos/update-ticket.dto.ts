@@ -12,7 +12,8 @@ import { Priority, Status } from 'src/common/enums';
 export class UpdateTicketDto {
   @IsOptional()
   @IsNotEmpty()
-  @IsEnum(ENUM(Status.IN_PROGRESS, Status.RESOLVED, Status.CLOSED))
+  // @IsEnum(ENUM(Status.IN_PROGRESS, Status.RESOLVED, Status.CLOSED))
+  @IsEnum(Status)
   status?: Status;
 
   @IsOptional()
